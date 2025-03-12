@@ -27,7 +27,7 @@ resource virtual_network 'Microsoft.Network/virtualNetworks@2023-09-01' existing
 
 // Subnet for pod pods
 resource control_plane_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
-  name: '${project_prefix}-${env_prefix}-project'
+  name: '${project_prefix}-${env_prefix}-master-plane'
   parent: virtual_network
   properties: {
     addressPrefix: control_plane_cidr
@@ -38,7 +38,7 @@ resource control_plane_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09
 }
 
 resource worker_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
-  name: '${project_prefix}-${env_prefix}-project'
+  name: '${project_prefix}-${env_prefix}-worker-plane'
   parent: virtual_network
   properties: {
     addressPrefix: worker_cidr
