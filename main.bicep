@@ -23,7 +23,22 @@ param storage_cidr string = '10.0.5.0/24'
 param jumpbox_cidr string = '10.0.6.0/24'
 param bastion_cidr string = '10.0.7.0/24'
 
+// Jumpbox Configuration
 param deploy_jumpbox bool = false
+
+// Redhat Configuration:
+@secure()
+@description('The pull secret for Red Hat OpenShift')
+param redhat_pull_secret string = ''
+param control_plane_vm_size string = 'Standard_D4s_v3'
+param pool_cluster_size string = 'Standard_D4s_v3'
+param pool_cluster_disk_size int = 128
+param pool_cluster_count int = 3
+
+// Service Principal Configuration:
+@description('The role to assign to the service principal')
+//param role_definition_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Reader role Commercial
+param role_definition_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Reader role Government
 
 // Tag Configuration:
 param default_tag_name string
@@ -77,7 +92,7 @@ module storage './modules/storage.bicep' = {
 module key_vault './modules/key-vault.bicep' = {
   name: 'key-vault'
   params: {
-    key_vault_name: '${project_prefix}-${env_prefix}-kv'
+    key_vault_name: '${project_prefix}-${env_prefix}-key'
     location: location
     subnet_id: existing_network.outputs.key_vault_subnet_id
     vnet_id: existing_network.outputs.id
@@ -86,17 +101,33 @@ module key_vault './modules/key-vault.bicep' = {
   }
 }
 
-// module aro './modules/aro.bicep' = {
-//   name: 'aro'
-//   params: {
-//     aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
-//     location: location
-//     subnet_id: existing_network.outputs.control_plane_subnet_id
+module service_principal './modules/service-principal.bicep' = {
+  name: 'service-principal'
+  params: {
+    service_principal_name: '${project_prefix}-${env_prefix}-cluster-sp'
+    role_definition_id: role_definition_id
+    scope: subscription().id
+  }
+}
 
-//     default_tag_name: default_tag_name
-//     default_tag_value: default_tag_value
-//   }
-// }
+module aro './modules/aro.bicep' = {
+  name: 'aro'
+  params: {
+    aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
+    location: location
+    control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
+    worker_subnet_id: existing_network.outputs.worker_subnet_id
+    control_plane_vm_size: control_plane_vm_size
+    pool_cluster_size: pool_cluster_size
+    pool_cluster_disk_size: pool_cluster_disk_size
+    pool_cluster_count: pool_cluster_count
+    service_principal_client_id: service_principal.outputs.servicePrincipalClientId
+    service_principal_client_secret: service_principal.outputs.servicePrincipalClientSecret
+    redhat_pull_secret: redhat_pull_secret
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+  }
+}
 
 output registry_id string = registry.outputs.id
 output storage_id string = storage.outputs.id

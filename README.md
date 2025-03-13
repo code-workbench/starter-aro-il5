@@ -54,6 +54,7 @@ To manage your Azure resources, you need to install the Azure CLI. Follow the in
     ```
 
 After installation, you can verify the installation by running:
+
 ```bash
 az --version
 ```
@@ -62,10 +63,13 @@ az --version
 
 The following steps will make it possible to deploy with a brand new network:
 For deploying to Azure Government run the following:
+
 ```bash
 az cloud set --name AzureUSGovernment
 ```
+
 The following is the command to login.  
+
 ```bash
 az login
 ```
@@ -76,7 +80,7 @@ You can leverage the following to deploy this template to your environment:
 
 **NOTE: This requires the an existing virtual network to deploy.  To Create one, use the following:**
 
-```
+```bash
 RESOURCE_GROUP_NAME="starter-aro-il5"
 VNET_NAME="starter-aro-il5-vnet"
 LOCATION="usgovvirginia"
@@ -89,11 +93,19 @@ az group create --name $RESOURCE_GROUP_NAME --location $LOCATION
 az network vnet create --name $VNET_NAME --resource-group $RESOURCE_GROUP_NAME --subnet-name $SUBNET_NAME
 ```
 
-```
+```bash
 PROJECT_PREFIX="aroil5"
 ENV_PREFIX="dev"
 DEFAULT_TAG_NAME="Environment"
 DEFAULT_TAG_VALUE="aro-il5"
 
 az deployment group create --resource-group $RESOURCE_GROUP_NAME --template-file ./main.bicep --parameters project_prefix=$PROJECT_PREFIX env_prefix=$ENV_PREFIX location=$LOCATION existing_network_name=$VNET_NAME default_tag_name=$DEFAULT_TAG_NAME default_tag_value=$DEFAULT_TAG_VALUE
+```
+
+# Delete Infrastructure
+
+If you need to clean up the infrastructure, you can do so by running the following:
+
+```bash
+az group delete --name $RESOURCE_GROUP_NAME -y
 ```

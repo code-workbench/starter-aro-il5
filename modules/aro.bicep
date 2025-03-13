@@ -1,11 +1,12 @@
 param aro_cluster_name string
 param location string = resourceGroup().location
-param subnet_id string
+
+param control_plane_subnet_id string
+param worker_subnet_id string
 
 @secure()
-param rehat_pull_secret string
+param redhat_pull_secret string = ''
 
-param cluster_sku string = 'Standard'
 param control_plane_vm_size string = 'Standard_D8s_v3'
 param pool_cluster_size string = 'Standard_D4s_v3'
 param pool_cluster_disk_size int = 128
@@ -19,9 +20,9 @@ param pod_cidr string = '10.0.1.0/24'
 param service_cidr string = '10.0.1.0/24'
 param dns_service_ip string = '10.0.1.10'
 
-param api_server_visibility string = 'Public'
+param api_server_visibility string = 'Private'
 
-param ingress_server_visibility string = 'Public'
+param ingress_server_visibility string = 'Private'
 
 param cluster_domain string = ''
 
@@ -38,7 +39,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
   properties: {
     clusterProfile: {
       domain: cluster_domain
-      pullSecret: rehat_pull_secret
+      pullSecret: redhat_pull_secret
     }
     networkProfile: {
       podCidr: pod_cidr
@@ -51,14 +52,14 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
     }
     masterProfile: {
       vmSize: control_plane_vm_size
-      subnetId: resourceId('Microsoft.Network/virtualNetworks/subnets', clusterVnetName, 'master')
+      subnetId: control_plane_subnet_id
     }
     workerProfiles: [
       {
         name: 'worker'
         vmSize: pool_cluster_size
         diskSizeGB: pool_cluster_disk_size
-        subnetId: resourceId('Microsoft.Network/virtualNetworks/subnets', clusterVnetName, 'worker')
+        subnetId: worker_subnet_id
         count: pool_cluster_count
       }
     ]
