@@ -1,5 +1,7 @@
+echo "Sourcing Functions..."
 # Function to check if jq is installed
 check_jq_installed() {
+    echo "Checking if jq is installed..."
     if ! command -v jq &> /dev/null; then
         echo "jq is not installed. Installing jq..."
         if [[ $(uname -s) == "Linux" ]]; then
@@ -18,7 +20,6 @@ load_parameters() {
         echo "Loading parameters from $env_file"
         RESOURCE_GROUP_NAME=$(jq -r '.resourceGroupName' ./envs/default.json)
         PROJECT_PREFIX=$(jq -r '.projectPrefix' ./envs/default.json)
-
         ENV_PREFIX=$(jq -r '.envPrefix' ./envs/default.json)
         VNET_NAME=$(jq -r '.vnetName' ./envs/default.json)
         LOCATION=$(jq -r '.location' ./envs/default.json)
@@ -34,6 +35,8 @@ load_parameters() {
 }
 
 output_parameters() {
+    echo "Loaded parameters:"
+    echo "--------------------------------"
     echo "Resource Group Name: $RESOURCE_GROUP_NAME"
     echo "Project Prefix: $PROJECT_PREFIX"
     echo "Environment Prefix: $ENV_PREFIX"
@@ -41,6 +44,7 @@ output_parameters() {
     echo "Location: $LOCATION"
     echo "Default Tag Name: $DEFAULT_TAG_NAME"
     echo "Default Tag Value: $DEFAULT_TAG_VALUE"
+    echo "--------------------------------"
 }
 
 parse_passed_parameters() {
@@ -57,4 +61,6 @@ parse_passed_parameters() {
         esac
         shift
     done
+
+    output_parameters
 }

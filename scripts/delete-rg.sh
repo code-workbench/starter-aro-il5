@@ -13,4 +13,6 @@ else
 fi
 
 # Delete the resource group
+echo "Deleting resource group: $RESOURCE_GROUP_NAME"
 az group delete --name $RESOURCE_GROUP_NAME --yes
+echo "Resource group $RESOURCE_GROUP_NAME deleted successfully."
