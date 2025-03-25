@@ -26,7 +26,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-prev
   properties: {
     roleDefinitionId: role_definition_id
     principalId: sp.properties.principalId
-    scope: scope
+    scope: resourceGroup().id
   }
 }
 

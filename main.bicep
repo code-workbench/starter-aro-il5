@@ -44,6 +44,9 @@ param role_definition_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Read
 param default_tag_name string
 param default_tag_value string
 
+//Suffix for resources
+var uniqueSuffix = uniqueString(resourceGroup().id)
+
 //Deploy into a existing network
 module existing_network './modules/network.bicep' = {
   name: 'existing-network'
@@ -92,7 +95,7 @@ module storage './modules/storage.bicep' = {
 module key_vault './modules/key-vault.bicep' = {
   name: 'key-vault'
   params: {
-    key_vault_name: '${project_prefix}-${env_prefix}-key'
+    key_vault_name: '${project_prefix}-${env_prefix}-key-${uniqueSuffix}'
     location: location
     subnet_id: existing_network.outputs.key_vault_subnet_id
     vnet_id: existing_network.outputs.id

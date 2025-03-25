@@ -76,6 +76,15 @@ az login
 
 # Deploy the template
 
+For this project, we have implemented vscode tasks for common operations to make it easier to use.  These include the following:
+
+- **Az Login:** Performs an azure cli login.  
+- **Delete Resource Group:** Will leverage Azure CLI to delete the resource group that is being used to deploy this template.  
+- **Create RG and Vnet:** Will leverage Azure CLI to create a resource group and landing vnet for this solution.  
+- **Deploy Template:** Will leverage Azure CLI to deploy the bicep template. 
+
+# Deploy the template (Manually)
+
 You can leverage the following to deploy this template to your environment:
 
 **NOTE: This requires the an existing virtual network to deploy.  To Create one, use the following:**

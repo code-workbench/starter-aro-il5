@@ -20,6 +20,7 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     publicNetworkAccess: 'Disabled'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
+    allowSharedKeyAccess: false
     networkAcls: {
       defaultAction: 'Deny'
       bypass: 'None'

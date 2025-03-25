@@ -1,0 +1,75 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Az Login",
+            "type": "shell",
+            "command": "az login --use-device-code"
+        },
+        {
+            "label": "Delete Resource Group",
+            "type": "shell",
+            "command": "./scripts/delete-rg.sh",
+            "args": [
+                "--resource-group-name", "starter-aro-il5"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Create RG and Vnet",
+            "type": "shell",
+            "command": "./scripts/create-rg-vnet.sh",
+            "args": [
+                "--resource-group-name", "starter-aro-il5",
+                "--vnet-name", "starter-aro-il5-vnet",
+                "--location", "usgovvirginia",
+                "--subnet-name", "default"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy Template",
+            "type": "shell",
+            "command": "./scripts/deploy-template.sh",
+            "args": [
+                "--resource-group-name", "starter-aro-il5",
+                "--project-prefix","aroil5",
+                "--env-prefix","dev",
+                "--vnet-name", "starter-aro-il5-vnet",
+                "--location", "usgovvirginia",
+                "--default-tag-name","Environment",
+                "--default-tag-value","aro-il5",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}
