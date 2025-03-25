@@ -4,6 +4,22 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Delete and Redeploy",
+            "type": "shell",
+            "command": "./scripts/delete-rg.sh ; ./scripts/create-rg-vnet.sh ; ./scripts/deploy-template.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": true
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Az Login",
             "type": "shell",
             "command": "az login --use-device-code"
@@ -52,7 +68,7 @@
             "presentation": {
                 "reveal": "always",
                 "panel": "shared",
-                "close": true
+                "close": false
             },
             "problemMatcher": []
         }

@@ -3,7 +3,7 @@
     "vnetName": "starter-aro-il5-vnet",
     "location": "usgovvirginia",
     "subnetName": "default",
-    "projectPrefix": "aro",
+    "projectPrefix": "aro1",
     "envPrefix": "dev",
     "defaultTagName": "Environment",
     "defaultTagValue": "dev"

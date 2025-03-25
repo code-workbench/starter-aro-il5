@@ -13,22 +13,14 @@ resource sp 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   location: resourceGroup().location
 }
 
-resource spPassword 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: '${service_principal_name}-password'
-  location: resourceGroup().location
-  properties: {
-    principalId: sp.properties.principalId
-  }
-}
-
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
   name: guid(subscription().id, service_principal_name, role_definition_id)
   properties: {
     roleDefinitionId: role_definition_id
     principalId: sp.properties.principalId
-    scope: resourceGroup().id
+    scope: scope
   }
 }
 
 output servicePrincipalClientId string = sp.properties.clientId
-output servicePrincipalClientSecret string = spPassword.properties.clientSecret
+
