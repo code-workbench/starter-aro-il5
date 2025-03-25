@@ -24,4 +24,6 @@ if [[ -z "$RESOURCE_GROUP_NAME" || -z "$VNET_NAME" || -z "$LOCATION" || -z "$PRO
     exit 1
 fi
 
-az deployment group create --resource-group $RESOURCE_GROUP_NAME --template-file ./main.bicep --parameters project_prefix=$PROJECT_PREFIX env_prefix=$ENV_PREFIX location=$LOCATION existing_network_name=$VNET_NAME default_tag_name=$DEFAULT_TAG_NAME default_tag_value=$DEFAULT_TAG_VALUE
+TEMPLATE_FILE=$(realpath ./main.bicep)
+
+az deployment group create --resource-group $RESOURCE_GROUP_NAME --template-file $TEMPLATE_FILE --parameters project_prefix=$PROJECT_PREFIX env_prefix=$ENV_PREFIX location=$LOCATION existing_network_name=$VNET_NAME default_tag_name=$DEFAULT_TAG_NAME default_tag_value=$DEFAULT_TAG_VALUE
