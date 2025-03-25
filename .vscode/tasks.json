@@ -12,9 +12,7 @@
             "label": "Delete Resource Group",
             "type": "shell",
             "command": "./scripts/delete-rg.sh",
-            "args": [
-                "--resource-group-name", "starter-aro-il5"
-            ],
+            "args": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -30,12 +28,7 @@
             "label": "Create RG and Vnet",
             "type": "shell",
             "command": "./scripts/create-rg-vnet.sh",
-            "args": [
-                "--resource-group-name", "starter-aro-il5",
-                "--vnet-name", "starter-aro-il5-vnet",
-                "--location", "usgovvirginia",
-                "--subnet-name", "default"
-            ],
+            "args": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -51,15 +44,7 @@
             "label": "Deploy Template",
             "type": "shell",
             "command": "./scripts/deploy-template.sh",
-            "args": [
-                "--resource-group-name", "starter-aro-il5",
-                "--project-prefix","aroil5",
-                "--env-prefix","dev",
-                "--vnet-name", "starter-aro-il5-vnet",
-                "--location", "usgovvirginia",
-                "--default-tag-name","Environment",
-                "--default-tag-value","aro-il5",
-            ],
+            "args": [],
             "group": {
                 "kind": "build",
                 "isDefault": true

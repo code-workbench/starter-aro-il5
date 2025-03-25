@@ -83,6 +83,14 @@ For this project, we have implemented vscode tasks for common operations to make
 - **Create RG and Vnet:** Will leverage Azure CLI to create a resource group and landing vnet for this solution.  
 - **Deploy Template:** Will leverage Azure CLI to deploy the bicep template. 
 
+To run this tasks, you can click "F1" or "Ctrl+Shift+P" or go to "Terminal" => "Run Task".
+
+The following menu will appear:
+![alt text](./images/run-task.png)
+
+And then select your task:
+![alt text](./images/select-tasks.png)
+
 # Deploy the template (Manually)
 
 You can leverage the following to deploy this template to your environment:

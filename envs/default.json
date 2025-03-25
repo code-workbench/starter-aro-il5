@@ -1,0 +1,10 @@
+{
+    "resourceGroupName": "starter-aro-il5",
+    "vnetName": "starter-aro-il5-vnet",
+    "location": "usgovvirginia",
+    "subnetName": "default",
+    "projectPrefix": "aro",
+    "envPrefix": "dev",
+    "defaultTagName": "Environment",
+    "defaultTagValue": "dev"
+}

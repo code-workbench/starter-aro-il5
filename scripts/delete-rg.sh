@@ -1,22 +1,16 @@
 # !/bin/bash
-# This script creates a resource group and a virtual network in Azure.
+# This script deletes a resource group in Azure.
 # It requires the Azure CLI to be installed and configured.
 
-# Parse command-line arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        --resource-group-name) RESOURCE_GROUP_NAME="$2"; shift ;;
-        *) echo "Unknown parameter passed: $1"; exit 1 ;;
-    esac
-    shift
-done
+source "$(dirname "$0")/common.sh"
 
-# Validate required arguments
-if [[ -z "$RESOURCE_GROUP_NAME" ]]; then
-    echo "Error: Missing required arguments."
-    echo "Usage: $0 --resource-group-name <name>"
-    exit 1
+check_jq_installed
+
+if [[ "$#" -eq 0 ]]; then
+    load_parameters
+else
+    parse_passed_parameters "$@"
 fi
 
-# Create the resource group
+# Delete the resource group
 az group delete --name $RESOURCE_GROUP_NAME --yes
