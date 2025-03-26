@@ -41,13 +41,14 @@ load_parameters() {
 output_parameters() {
     echo "Loaded parameters:"
     echo "--------------------------------"
-    echo "Resource Group Name: $RESOURCE_GROUP_NAME"
+    echo "Resource Group Name: $NETWORK_RESOURCE_GROUP_NAME"
     echo "Project Prefix: $PROJECT_PREFIX"
     echo "Environment Prefix: $ENV_PREFIX"
     echo "Virtual Network Name: $VNET_NAME"
     echo "Location: $LOCATION"
     echo "Default Tag Name: $DEFAULT_TAG_NAME"
     echo "Default Tag Value: $DEFAULT_TAG_VALUE"
+    echo "Service Principal Client ID: $SERVICE_PRINCIPAL_CLIENT_ID"
     echo "--------------------------------"
 }
 

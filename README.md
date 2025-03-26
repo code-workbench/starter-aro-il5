@@ -78,7 +78,7 @@ az login
 
 The following are pre-reqs for using this repo.
 
-## Creating Environment Json:
+## Creating Environment JSON:
 
 For this implementation, you need to create an environment json, there is a sample in the repo under the '''./envs/sample.json'''.
 
@@ -138,6 +138,16 @@ az ad sp create-for-rbac --name "sp-$SP_NAME-${RANDOM}" > app-service-principal.
 SP_CLIENT_ID=$(jq -r '.appId' app-service-principal.json)
 SP_CLIENT_SECRET=$(jq -r '.password' app-service-principal.json)
 SP_OBJECT_ID=$(az ad sp show --id $SP_CLIENT_ID | jq -r '.id')
+```
+
+**NOTE: The Service Principal will need "Network Contributor" role on the virtual network being leveraged.**
+
+This can be assigned with the following:
+
+```bash
+SERVICE_PRINCIPAL_CLIENT_ID="" # The client id
+VNET_RESOURCE_ID="" # The resource id of the virtual network.
+az role assignment create --assignee $SERVICE_PRINCIPAL_CLIENT_ID --role "Network Contributor" --scope $VNET_RESOURCE_ID
 ```
 
 ## Update Reference

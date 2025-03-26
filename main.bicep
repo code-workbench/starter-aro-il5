@@ -28,6 +28,10 @@ param storage_cidr string = '10.1.64.0/18'
 param jumpbox_cidr string = '10.1.128.0/18'
 param bastion_cidr string = '10.1.192.0/18'
 
+// ARO Network Configuration
+param pod_cidr string = '10.0.192.0/18'
+param service_cidr string = '10.1.0.0/22'
+
 // Service Principal Configuration
 @description('The name of the service principal')
 @secure()
@@ -149,8 +153,8 @@ module aro './modules/aro.bicep' = {
     pool_cluster_size: pool_cluster_size
     pool_cluster_disk_size: pool_cluster_disk_size
     pool_cluster_count: pool_cluster_count
-    service_cidr: control_plane_cidr
-    pod_cidr: worker_cidr
+    service_cidr: service_cidr
+    pod_cidr: pod_cidr
     cluster_domain: 'aro-${project_prefix}-${env_prefix}'
     service_principal_client_id: service_principal_client_id
     service_principal_client_secret: service_principal_client_secret
