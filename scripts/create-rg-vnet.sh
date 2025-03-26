@@ -14,11 +14,11 @@ else
 fi
 
 # Create the resource group
-echo "Creating resource group: $RESOURCE_GROUP_NAME"
-az group create --name $RESOURCE_GROUP_NAME --location $LOCATION
-echo "Resource group $RESOURCE_GROUP_NAME created successfully."
+echo "Creating resource group: $NETWORK_RESOURCE_GROUP_NAME"
+az group create --name $NETWORK_RESOURCE_GROUP_NAME --location $LOCATION
+echo "Resource group $NETWORK_RESOURCE_GROUP_NAME created successfully."
 
 # Create the virtual network
 echo "Creating virtual network: $VNET_NAME"
-az network vnet create --name $VNET_NAME --resource-group $RESOURCE_GROUP_NAME --subnet-name $SUBNET_NAME
+az network vnet create --name $VNET_NAME --resource-group $NETWORK_RESOURCE_GROUP_NAME --subnet-name $SUBNET_NAME --address-prefix 10.0.0.0/15
 echo "Virtual network $VNET_NAME created successfully."

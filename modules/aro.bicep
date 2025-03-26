@@ -1,6 +1,8 @@
 param aro_cluster_name string
 param location string = resourceGroup().location
 
+param infra_rg_id string 
+
 param control_plane_subnet_id string
 param worker_subnet_id string
 
@@ -16,7 +18,7 @@ param service_principal_client_id string
 @secure()
 param service_principal_client_secret string
 
-param pod_cidr string = '10.0.1.0/24'
+param pod_cidr string = '10.0.1.0/18'
 param service_cidr string = '10.0.1.0/24'
 param dns_service_ip string = '10.0.1.10'
 
@@ -40,6 +42,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
     clusterProfile: {
       domain: cluster_domain
       pullSecret: redhat_pull_secret
+      resourceGroupId: infra_rg_id
     }
     networkProfile: {
       podCidr: pod_cidr

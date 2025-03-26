@@ -1,3 +1,8 @@
+targetScope = 'subscription'
+
+@description('The name of the networking resource group')
+param network_rg_name string
+
 // Basic Parameters
 @description('The project abbreviation')
 param project_prefix string 
@@ -15,13 +20,22 @@ param location string
 param existing_network_name string
 
 // Subnet Configuration
-param control_plane_cidr string = '10.0.1.0/24'
-param worker_cidr string = '10.0.2.0/24'
-param registry_cidr string = '10.0.3.0/24'
-param key_vault_cidr string = '10.0.4.0/24'
-param storage_cidr string = '10.0.5.0/24'
-param jumpbox_cidr string = '10.0.6.0/24'
-param bastion_cidr string = '10.0.7.0/24'
+param control_plane_cidr string = '10.0.64.0/18'
+param worker_cidr string = '10.0.128.0/18'
+param registry_cidr string = '10.0.192.0/18'
+param key_vault_cidr string = '10.1.0.0/18'
+param storage_cidr string = '10.1.64.0/18'
+param jumpbox_cidr string = '10.1.128.0/18'
+param bastion_cidr string = '10.1.192.0/18'
+
+// Service Principal Configuration
+@description('The name of the service principal')
+@secure()
+param service_principal_client_id string
+
+@description('The secret for the service principal')
+@secure()
+param service_principal_client_secret string
 
 // Jumpbox Configuration
 param deploy_jumpbox bool = false
@@ -30,26 +44,41 @@ param deploy_jumpbox bool = false
 @secure()
 @description('The pull secret for Red Hat OpenShift')
 param redhat_pull_secret string = ''
-param control_plane_vm_size string = 'Standard_D4s_v3'
-param pool_cluster_size string = 'Standard_D4s_v3'
+param control_plane_vm_size string = 'Standard_D8s_v3'
+param pool_cluster_size string = 'Standard_D8s_v3'
 param pool_cluster_disk_size int = 128
 param pool_cluster_count int = 3
-
-// Service Principal Configuration:
-@description('The role to assign to the service principal')
-//param role_definition_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Reader role Commercial
-param role_definition_id string = 'b24988ac-6180-42a0-ab88-20f7382dd24c' // Reader role Government
 
 // Tag Configuration:
 param default_tag_name string
 param default_tag_value string
 
 //Suffix for resources
-var uniqueSuffix = uniqueString(resourceGroup().id)
+var uniqueSuffix = uniqueString(subscription().id)
+
+resource network_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+  name: network_rg_name
+}
+
+resource shared_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: '${project_prefix}-${env_prefix}-shared'
+  location: location
+}
+
+resource aro_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: '${project_prefix}-${env_prefix}-aro'
+  location: location
+}
+
+resource aro_infra_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: '${project_prefix}-${env_prefix}-aro-infra'
+  location: location
+}
 
 //Deploy into a existing network
 module existing_network './modules/network.bicep' = {
   name: 'existing-network'
+  scope: network_resource_group
   params: {
     location: location
     project_prefix: project_prefix
@@ -70,6 +99,7 @@ module existing_network './modules/network.bicep' = {
 
 module registry './modules/registry.bicep' = {
   name: 'registry'
+  scope: shared_resource_group
   params: {
     acr_name: '${project_prefix}${env_prefix}acr'
     location: location
@@ -82,6 +112,7 @@ module registry './modules/registry.bicep' = {
 
 module storage './modules/storage.bicep' = {
   name: 'storage'
+  scope: shared_resource_group
   params: {
     storage_account_name: '${project_prefix}${env_prefix}stg'
     location: location
@@ -94,6 +125,7 @@ module storage './modules/storage.bicep' = {
 
 module key_vault './modules/key-vault.bicep' = {
   name: 'key-vault'
+  scope: shared_resource_group
   params: {
     key_vault_name: '${project_prefix}-${env_prefix}-key-${uniqueSuffix}'
     location: location
@@ -104,33 +136,31 @@ module key_vault './modules/key-vault.bicep' = {
   }
 }
 
-module service_principal './modules/service-principal.bicep' = {
-  name: 'service-principal'
-  params: {
-    service_principal_name: '${project_prefix}-${env_prefix}-cluster-sp'
-    role_definition_id: role_definition_id
-    scope: subscription().id
-  }
-}
-
 module aro './modules/aro.bicep' = {
   name: 'aro'
+  scope: aro_resource_group
   params: {
     aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
     location: location
+    infra_rg_id: aro_infra_resource_group.id
     control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
     worker_subnet_id: existing_network.outputs.worker_subnet_id
     control_plane_vm_size: control_plane_vm_size
     pool_cluster_size: pool_cluster_size
     pool_cluster_disk_size: pool_cluster_disk_size
     pool_cluster_count: pool_cluster_count
-    service_principal_client_id: service_principal.outputs.servicePrincipalClientId
-    service_principal_client_secret: service_principal.outputs.servicePrincipalClientSecret
+    service_cidr: control_plane_cidr
+    pod_cidr: worker_cidr
+    cluster_domain: 'aro-${project_prefix}-${env_prefix}'
+    service_principal_client_id: service_principal_client_id
+    service_principal_client_secret: service_principal_client_secret
     redhat_pull_secret: redhat_pull_secret
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
   }
 }
+
+// TODO: Adding Jumpbox module
 
 output registry_id string = registry.outputs.id
 output storage_id string = storage.outputs.id

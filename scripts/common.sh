@@ -1,3 +1,5 @@
+CONFIG_JSON="./envs/dev.json"
+
 echo "Sourcing Functions..."
 # Function to check if jq is installed
 check_jq_installed() {
@@ -15,17 +17,19 @@ check_jq_installed() {
 
 # Function to load parameters from a JSON file
 load_parameters() {
-    local env_file=${1:-"./envs/default.json"} # Use "./envs/default.json" if $1 is not provided
+    local env_file=${1:-"$CONFIG_JSON"} # Use "$CONFIG_JSON" if $1 is not provided
     if [[ -f "$env_file" ]]; then
         echo "Loading parameters from $env_file"
-        RESOURCE_GROUP_NAME=$(jq -r '.resourceGroupName' ./envs/default.json)
-        PROJECT_PREFIX=$(jq -r '.projectPrefix' ./envs/default.json)
-        ENV_PREFIX=$(jq -r '.envPrefix' ./envs/default.json)
-        VNET_NAME=$(jq -r '.vnetName' ./envs/default.json)
-        LOCATION=$(jq -r '.location' ./envs/default.json)
-        SUBNET_NAME=$(jq -r '.subnetName' ./envs/default.json)
-        DEFAULT_TAG_NAME=$(jq -r '.defaultTagName' ./envs/default.json)
-        DEFAULT_TAG_VALUE=$(jq -r '.defaultTagValue' ./envs/default.json)
+        NETWORK_RESOURCE_GROUP_NAME=$(jq -r '.networkResourceGroupName' $CONFIG_JSON)
+        PROJECT_PREFIX=$(jq -r '.projectPrefix' $CONFIG_JSON)
+        ENV_PREFIX=$(jq -r '.envPrefix' $CONFIG_JSON)
+        VNET_NAME=$(jq -r '.vnetName' $CONFIG_JSON)
+        LOCATION=$(jq -r '.location' $CONFIG_JSON)
+        SUBNET_NAME=$(jq -r '.subnetName' $CONFIG_JSON)
+        DEFAULT_TAG_NAME=$(jq -r '.defaultTagName' $CONFIG_JSON)
+        DEFAULT_TAG_VALUE=$(jq -r '.defaultTagValue' $CONFIG_JSON)
+        SERVICE_PRINCIPAL_CLIENT_ID=$(jq -r '.servicePrincipalClientId' $CONFIG_JSON)
+        SERVICE_PRINCIPAL_CLIENT_SECRET=$(jq -r '.servicePrincipalClientSecret' $CONFIG_JSON)
         
         output_parameters
     else 

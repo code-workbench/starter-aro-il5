@@ -74,6 +74,76 @@ The following is the command to login.
 az login
 ```
 
+# Pre-requisites
+
+The following are pre-reqs for using this repo.
+
+## Creating Environment Json:
+
+For this implementation, you need to create an environment json, there is a sample in the repo under the '''./envs/sample.json'''.
+
+You can create a new file using the following command:
+
+```
+ENV_FILE_NAME="" # Name of the file
+cp ./envs/sample.json "./envs/$ENV_FILE_NAME"
+```
+
+You will then need to populate the following parameters:
+
+## Setting Configuration Parameters:
+
+Below is an example configuration that you can use to populate your environment JSON file:
+
+```json
+{
+    "resourceGroupName": "starter-aro-il5",
+    "vnetName": "starter-aro-il5-vnet",
+    "location": "usgovvirginia",
+    "subnetName": "default",
+    "projectPrefix": "aro1",
+    "envPrefix": "dev",
+    "defaultTagName": "Environment",
+    "defaultTagValue": "dev",
+    "servicePrincipalClientId": "",
+    "servicePrincipalClientSecret": ""
+}
+```
+
+The values are:
+**resourceGroupName:** The resource group to deploy to.
+**vnetName:** The name of the virtual network to connect to.  
+**location:** The region to deploy to.
+**subnetName:** The name of the default subnet to make sure that the newly created vnet has.  *Only required if you are creating a new virtual network as a starting point.*
+**projectPrefix:** A prefix to denote as part of the naming convention. 
+**envPrefix:** A prefix identifying the environment being deployed.  
+**defaultTagName:** A default tag to put on the environment. 
+**defaultTagValue:** The value of the tag to be applied to all resources on the environment. 
+**servicePrincipalClientId:** The Client ID of the Service Principal required for ARO.
+**servicePrincipalClientSecret:** The Client Secret of the Service Principal required for ARO.  
+
+Make sure to replace the `servicePrincipalClientId` and `servicePrincipalClientSecret` with the values from your created service principal.
+
+## Creating Service Principal:
+
+For this template, you will need to provide a service principal.
+
+You can generate it with the following command:
+
+```bash
+# The name of the resource group
+SP_NAME=""
+
+az ad sp create-for-rbac --name "sp-$SP_NAME-${RANDOM}" > app-service-principal.json
+SP_CLIENT_ID=$(jq -r '.appId' app-service-principal.json)
+SP_CLIENT_SECRET=$(jq -r '.password' app-service-principal.json)
+SP_OBJECT_ID=$(az ad sp show --id $SP_CLIENT_ID | jq -r '.id')
+```
+
+## Update Reference
+
+To make all tasks point to your configuration, you can update the ENV_FILE found [here](./scripts/common.sh).
+
 # Deploy the template
 
 For this project, we have implemented vscode tasks for common operations to make it easier to use.  These include the following:
@@ -115,8 +185,19 @@ PROJECT_PREFIX="aroil5"
 ENV_PREFIX="dev"
 DEFAULT_TAG_NAME="Environment"
 DEFAULT_TAG_VALUE="aro-il5"
+SERVICE_PRINCIPAL_CLIENT_ID=""
+SERVICE_PRINCIPAL_CLIENT_SECRET=""
 
-az deployment group create --resource-group $RESOURCE_GROUP_NAME --template-file ./main.bicep --parameters project_prefix=$PROJECT_PREFIX env_prefix=$ENV_PREFIX location=$LOCATION existing_network_name=$VNET_NAME default_tag_name=$DEFAULT_TAG_NAME default_tag_value=$DEFAULT_TAG_VALUE
+az deployment group create --resource-group $RESOURCE_GROUP_NAME \
+    --template-file $TEMPLATE_FILE --parameters \
+    project_prefix=$PROJECT_PREFIX \
+    env_prefix=$ENV_PREFIX \
+    location=$LOCATION \
+    existing_network_name=$VNET_NAME \
+    default_tag_name=$DEFAULT_TAG_NAME \
+    default_tag_value=$DEFAULT_TAG_VALUE \
+    service_principal_client_id=$SERVICE_PRINCIPAL_CLIENT_ID \
+    service_principal_client_secret=$SERVICE_PRINCIPAL_CLIENT_SECRET
 ```
 
 # Delete Infrastructure

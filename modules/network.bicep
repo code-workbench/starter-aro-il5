@@ -8,8 +8,8 @@ param location string
 param existing_network_name string = ''
 
 // Optional Parameters:
-param control_plane_cidr string = '10.0.1.0/24'
-param worker_cidr string = '10.0.2.0/24'
+param control_plane_cidr string = '10.0.1.0/18'
+param worker_cidr string = '10.0.2.0/18'
 param registry_cidr string = '10.0.3.0/24'
 param key_vault_cidr string = '10.0.4.0/24'
 param storage_cidr string = '10.0.5.0/24'

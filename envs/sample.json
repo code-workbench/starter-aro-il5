@@ -1,10 +1,12 @@
 {
-    "resourceGroupName": "starter-aro-il5",
+    "networkResourceGroupName": "starter-aro-il5",
     "vnetName": "starter-aro-il5-vnet",
     "location": "usgovvirginia",
     "subnetName": "default",
     "projectPrefix": "aro1",
     "envPrefix": "dev",
     "defaultTagName": "Environment",
-    "defaultTagValue": "dev"
+    "defaultTagValue": "dev",
+    "servicePrincipalClientId": "",
+    "servicePrincipalClientSecret": ""
 }
