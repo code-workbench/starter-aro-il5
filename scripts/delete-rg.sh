@@ -25,6 +25,8 @@ echo "Deleting shared resource group..."
 az group delete --name "$PROJECT_PREFIX-$ENV_PREFIX-shared" --yes
 echo "Shared resource group '$PROJECT_PREFIX-$ENV_PREFIX-shared' deleted successfully."
 
+sleep 5s
+
 echo "Deleting resource group: $NETWORK_RESOURCE_GROUP_NAME"
 az group delete --name $NETWORK_RESOURCE_GROUP_NAME --yes
 echo "Resource group $NETWORK_RESOURCE_GROUP_NAME deleted successfully."

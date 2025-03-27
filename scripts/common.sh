@@ -30,6 +30,7 @@ load_parameters() {
         DEFAULT_TAG_VALUE=$(jq -r '.defaultTagValue' $CONFIG_JSON)
         SERVICE_PRINCIPAL_CLIENT_ID=$(jq -r '.servicePrincipalClientId' $CONFIG_JSON)
         SERVICE_PRINCIPAL_CLIENT_SECRET=$(jq -r '.servicePrincipalClientSecret' $CONFIG_JSON)
+        SUBSCRIPTION_ID=$(jq -r '.subscriptionId' $CONFIG_JSON)
         
         output_parameters
     else 
@@ -49,6 +50,7 @@ output_parameters() {
     echo "Default Tag Name: $DEFAULT_TAG_NAME"
     echo "Default Tag Value: $DEFAULT_TAG_VALUE"
     echo "Service Principal Client ID: $SERVICE_PRINCIPAL_CLIENT_ID"
+    echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "--------------------------------"
 }
 

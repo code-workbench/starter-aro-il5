@@ -8,5 +8,6 @@
     "defaultTagName": "Environment",
     "defaultTagValue": "dev",
     "servicePrincipalClientId": "",
-    "servicePrincipalClientSecret": ""
+    "servicePrincipalClientSecret": "",
+    "subscriptionId":""
 }
