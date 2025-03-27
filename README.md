@@ -154,7 +154,28 @@ az role assignment create --assignee $SERVICE_PRINCIPAL_CLIENT_ID --role "Networ
 
 To make all tasks point to your configuration, you can update the ENV_FILE found [here](./scripts/common.sh).
 
-# Deploy the template
+# Network Considerations:
+
+The following are key network considerations for deploying Azure RedHat OpenShift.  
+
+1. You must have a big enough cidr block.  ARO requires that the pod cidr supports a /18.  
+1. Granting "Network Contributor" rights to your virtual network for the "Azure RedHat OpenShift Resource Provider", more can be found [here](https://learn.microsoft.com/en-us/answers/questions/1687840/whats-the-purpose-and-role-of-azure-red-hat-opensh).
+
+# Deploy this template
+
+For this, we have 3 options for deploying this template:
+
+1. Deploy directly from this readme.
+1. Deploy using vscode tasks
+1. Deploy manually
+
+## Deploy directy from this readme
+
+You can deploy this template directly to Azure Government by clicking the button below:
+
+[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fkm%2Finitial_aro_template%2Fmain.bicep)
+
+## Deploy using vscode tasks
 
 For this project, we have implemented vscode tasks for common operations to make it easier to use.  These include the following:
 
@@ -171,7 +192,7 @@ The following menu will appear:
 And then select your task:
 ![alt text](./images/select-tasks.png)
 
-# Deploy the template (Manually)
+## Deploy template manually
 
 You can leverage the following to deploy this template to your environment:
 
@@ -189,6 +210,8 @@ az group create --name $RESOURCE_GROUP_NAME --location $LOCATION
 # Create the virtual network
 az network vnet create --name $VNET_NAME --resource-group $RESOURCE_GROUP_NAME --subnet-name $SUBNET_NAME
 ```
+
+**NOTE: You will need to give your service principal and the "Azure Open Shift RP" service principal "Network Contributor" rights.**
 
 ```bash
 PROJECT_PREFIX="aroil5"

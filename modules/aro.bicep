@@ -1,7 +1,8 @@
 param aro_cluster_name string
 param location string = resourceGroup().location
 
-param infra_rg_id string 
+param project_prefix string
+param env_prefix string
 
 param control_plane_subnet_id string
 param worker_subnet_id string
@@ -42,7 +43,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
     clusterProfile: {
       domain: cluster_domain
       pullSecret: redhat_pull_secret
-      resourceGroupId: infra_rg_id
+      resourceGroupId: subscriptionResourceId('Microsoft.Resources/resourceGroups', '${project_prefix}-${env_prefix}-aro-infra')
     }
     networkProfile: {
       podCidr: pod_cidr

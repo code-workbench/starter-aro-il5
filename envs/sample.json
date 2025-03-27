@@ -9,5 +9,6 @@
     "defaultTagValue": "dev",
     "servicePrincipalClientId": "",
     "servicePrincipalClientSecret": "",
-    "subscriptionId":""
+    "subscriptionId":"",
+    "deployJumpBox": false
 }

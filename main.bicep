@@ -74,11 +74,6 @@ resource aro_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   location: location
 }
 
-resource aro_infra_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
-  name: '${project_prefix}-${env_prefix}-aro-infra'
-  location: location
-}
-
 //Deploy into a existing network
 module existing_network './modules/network.bicep' = {
   name: 'existing-network'
@@ -146,7 +141,8 @@ module aro './modules/aro.bicep' = {
   params: {
     aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
     location: location
-    infra_rg_id: aro_infra_resource_group.id
+    project_prefix: project_prefix
+    env_prefix: env_prefix
     control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
     worker_subnet_id: existing_network.outputs.worker_subnet_id
     control_plane_vm_size: control_plane_vm_size
