@@ -1,6 +1,12 @@
 # Starter Azure RedHat OpenShift for IL5
 Infrastructure-as-Code template for Deploying Azure RedHat OpenShift in an IL5 environment.  The goal being to provide a starter template for getting an environment created and providing all the baseline controls.  
 
+# Deploy directy from this readme
+
+You can deploy this template directly to Azure Government by clicking the button below:
+
+[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fkm%2Fmain%2Fmain.bicep)
+
 # Installing Azure CLI
 
 To manage your Azure resources, you need to install the Azure CLI. Follow the instructions below to download and install it on your system.
