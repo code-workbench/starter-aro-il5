@@ -20,7 +20,6 @@
 	"forwardPorts": [],
 	"postCreateCommand": "git config --global --add safe.directory /workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers/features/azure-cli:1": {},
-		"ghcr.io/devcontainers/features/ssh-agent:1": {}
+		"ghcr.io/devcontainers/features/azure-cli:1": {}
 	}
 }
