@@ -1,0 +1,4 @@
+envs/*.json
+
+!envs/sample.json
+

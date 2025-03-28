@@ -1,0 +1,76 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Delete and Redeploy",
+            "type": "shell",
+            "command": "./scripts/delete-rg.sh ; ./scripts/create-rg-vnet.sh ; ./scripts/deploy-template.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Az Login",
+            "type": "shell",
+            "command": "az login --use-device-code"
+        },
+        {
+            "label": "Delete Resource Group",
+            "type": "shell",
+            "command": "./scripts/delete-rg.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Create RG and Vnet",
+            "type": "shell",
+            "command": "./scripts/create-rg-vnet.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": false
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy Template",
+            "type": "shell",
+            "command": "./scripts/deploy-template.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}
