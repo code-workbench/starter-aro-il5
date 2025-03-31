@@ -5,7 +5,7 @@ Infrastructure-as-Code template for Deploying Azure RedHat OpenShift in an IL5 e
 
 You can deploy this template directly to Azure Government by clicking the button below:
 
-[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fkm%2Fmain%2Fmain.bicep)
+[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fmain%2Fmain.bicep)
 
 # Installing Azure CLI
 
