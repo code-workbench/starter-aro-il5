@@ -109,6 +109,16 @@ module registry './modules/registry.bicep' = {
   }
 }
 
+module managed_identity_storage './modules/managed-identity.bicep' = {
+  name: 'managed-identity-storage'
+  scope: shared_resource_group
+  params: {
+    managedIdentityName: '${project_prefix}-${env_prefix}-storage-mi'
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+  }
+}
+
 module storage './modules/storage.bicep' = {
   name: 'storage'
   scope: shared_resource_group
@@ -119,8 +129,13 @@ module storage './modules/storage.bicep' = {
     vnet_id: existing_network.outputs.id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
+    key_name: 'storage-key'
+    key_vault_uri: key_vault.outputs.key_vault_uri
+    user_assigned_identity_id: managed_identity_storage.outputs.managedIdentityPrincipalId
   }
 }
+
+// TODO : Add key creation as part of the module.
 
 module key_vault './modules/key-vault.bicep' = {
   name: 'key-vault'
@@ -132,6 +147,7 @@ module key_vault './modules/key-vault.bicep' = {
     vnet_id: existing_network.outputs.id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
+    storage_account_managed_identity_id: managed_identity_storage.outputs.managedIdentityPrincipalId
   }
 }
 

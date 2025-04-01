@@ -6,6 +6,10 @@ param key_vault_sku_family string = 'A'
 param subnet_id string
 param vnet_id string 
 
+// Role Configuration
+param storage_account_managed_identity_id string
+param storage_account_role_definition_id string = 'e147488a-f6f5-4113-8e2d-b22465e65bf6' // Key Vault Crypto Service Encryption User
+
 param default_tag_name string
 param default_tag_value string
 
@@ -25,6 +29,13 @@ resource key_vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       name: key_vault_sku
       family: key_vault_sku_family
     }
+    enablePurgeProtection: true 
+    enableSoftDelete: true
+    softDeleteRetentionInDays: 90
+    enabledForDeployment: true 
+    enabledForTemplateDeployment: true 
+    enabledForDiskEncryption: true
+    enableRbacAuthorization: true 
     tenantId: subscription().tenantId
     accessPolicies: []
     publicNetworkAccess: 'Disabled'
@@ -34,6 +45,15 @@ resource key_vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       ipRules: []
       virtualNetworkRules: []
     }
+  }
+}
+
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: key_vault
+  name: guid(key_vault.id, storage_account_managed_identity_id, storage_account_role_definition_id)
+  properties: {
+    roleDefinitionId: storage_account_role_definition_id
+    principalId: storage_account_managed_identity_id
   }
 }
 
@@ -100,6 +120,7 @@ resource private_dns_zone_group 'Microsoft.Network/privateEndpoints/privateDnsZo
 }
 
 output id string = key_vault.id
+output key_vault_uri string = key_vault.properties.vaultUri
 output private_endpoint_id string = private_endpoint.id
 output private_dns_zone_id string = private_dns_zone.id
 output name string = key_vault.name 
