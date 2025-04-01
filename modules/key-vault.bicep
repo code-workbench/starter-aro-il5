@@ -10,6 +10,10 @@ param vnet_id string
 param storage_account_managed_identity_id string
 param storage_account_role_definition_id string = 'e147488a-f6f5-4113-8e2d-b22465e65bf6' // Key Vault Crypto Service Encryption User
 
+// Key Configuration:
+param storage_account_key_name string
+
+// Tag Configuration:
 param default_tag_name string
 param default_tag_value string
 
@@ -44,6 +48,18 @@ resource key_vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       bypass: 'None'
       ipRules: []
       virtualNetworkRules: []
+    }
+  }
+}
+
+resource storage_key 'Microsoft.KeyVault/vaults/keys@2024-11-01' = {
+  name: storage_account_key_name
+  parent: key_vault
+  properties: {
+    kty: 'RSA'
+    keySize: 2048
+    attributes: { 
+      enabled: true
     }
   }
 }

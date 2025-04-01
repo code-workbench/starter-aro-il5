@@ -28,6 +28,9 @@ param storage_cidr string = '10.1.64.0/18'
 param jumpbox_cidr string = '10.1.128.0/18'
 param bastion_cidr string = '10.1.192.0/18'
 
+// Key Configuration:
+param storage_account_key_name string = 'storage-key'
+
 // ARO Network Configuration
 param pod_cidr string = '10.0.192.0/18'
 param service_cidr string = '10.1.0.0/22'
@@ -129,7 +132,7 @@ module storage './modules/storage.bicep' = {
     vnet_id: existing_network.outputs.id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
-    key_name: 'storage-key'
+    key_name: storage_account_key_name
     key_vault_uri: key_vault.outputs.key_vault_uri
     user_assigned_identity_id: managed_identity_storage.outputs.managedIdentityPrincipalId
   }
@@ -148,6 +151,7 @@ module key_vault './modules/key-vault.bicep' = {
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
     storage_account_managed_identity_id: managed_identity_storage.outputs.managedIdentityPrincipalId
+    storage_account_key_name: storage_account_key_name
   }
 }
 
