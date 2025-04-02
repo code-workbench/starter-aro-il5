@@ -175,6 +175,8 @@ For this, we have 3 options for deploying this template:
 1. Deploy using vscode tasks
 1. Deploy manually
 
+**NOTE: This deployment can take around 30 minutes to deploy into your environment.**
+
 ## Deploy directy from this readme
 
 You can deploy this template directly to Azure Government by clicking the button below:
