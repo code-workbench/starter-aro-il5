@@ -45,7 +45,7 @@ resource key_vault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     publicNetworkAccess: 'Disabled'
     networkAcls: {
       defaultAction: 'Deny'
-      bypass: 'None'
+      bypass: 'AzureServices'
       ipRules: []
       virtualNetworkRules: []
     }
@@ -139,4 +139,4 @@ output id string = key_vault.id
 output key_vault_uri string = key_vault.properties.vaultUri
 output private_endpoint_id string = private_endpoint.id
 output private_dns_zone_id string = private_dns_zone.id
-output name string = key_vault.name 
+output name string = key_vault.name
