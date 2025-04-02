@@ -20,9 +20,19 @@
             "problemMatcher": []
         },
         {
+            "label": "Install azure cli (macOs)",
+            "type": "shell",
+            "command": "brew update && brew install azure-cli"
+        },
+        {
+            "label": "Install azure cli (linux/ubuntu)",
+            "type": "shell",
+            "command": "curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash"
+        },
+        {
             "label": "Az Login",
             "type": "shell",
-            "command": "az login --use-device-code"
+            "command": "az cloud set --name AzureUSGovernment ; az login --use-device-code"
         },
         {
             "label": "Delete Resource Group",
