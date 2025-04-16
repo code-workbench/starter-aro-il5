@@ -18,9 +18,6 @@ param bastion_cidr string = '10.0.7.0/24'
 
 param deploy_jumpbox bool = false
 
-param default_tag_name string
-param default_tag_value string
-
 resource virtual_network 'Microsoft.Network/virtualNetworks@2023-09-01' existing = {
   name: existing_network_name
 }
@@ -135,10 +132,6 @@ resource bastion_host 'Microsoft.Network/bastionHosts@2023-09-01' = if (deploy_j
       }
     ]
   }
-  dependsOn: [
-    bastion_subnet
-    bastion_pip
-  ]
 }
 
 output id string = virtual_network.id

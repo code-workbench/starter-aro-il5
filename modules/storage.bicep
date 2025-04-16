@@ -6,13 +6,12 @@ param vnet_id string
 param default_tag_name string
 param default_tag_value string
 
-
 // Key Vault Configuration:
 param key_vault_uri string // Key Vault URI for the customer-managed key
 param key_name string // Key name in the Key Vault
 
 // Identity Configuration:
-param user_assigned_identity_id string // Resource ID of the user-assigned managed identity
+param storage_managed_identity_id string
 
 resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storage_account_name
@@ -25,9 +24,9 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
   kind: 'StorageV2'
   identity: {
-    type: 'SystemAssigned, UserAssigned' // Enable both system-assigned and user-assigned identities
+    type: 'UserAssigned' // Enable both system-assigned and user-assigned identities
     userAssignedIdentities: {
-      '${user_assigned_identity_id}': {} // Reference the user-assigned managed identity
+      '${storage_managed_identity_id}': {}
     }
   }
   properties: {
@@ -36,23 +35,36 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     allowBlobPublicAccess: false
     allowSharedKeyAccess: false
     encryption: {
-      services: {
-        blob: {
-          enabled: true
-        }
-        file: {
-          enabled: true
-        }
+      identity: {
+        userAssignedIdentity: storage_managed_identity_id
       }
       keySource: 'Microsoft.Keyvault'
-      keyVaultProperties: {
-        keyName: key_name
-        keyVaultUri: key_vault_uri
+      keyvaultproperties: {
+        keyvaulturi: key_vault_uri
+        keyname: key_name
+      }
+      services: {
+        file: {
+          keyType: 'Account'
+          enabled: true
+        }
+        table: {
+          keyType: 'Account'
+          enabled: true
+        }
+        queue: {
+          keyType: 'Account'
+          enabled: true
+        }
+        blob: {
+          keyType: 'Account'
+          enabled: true
+        }
       }
     }
     networkAcls: {
       defaultAction: 'Deny'
-      bypass: 'None'
+      bypass: 'AzureServices'
       ipRules: []
       virtualNetworkRules: []
       resourceAccessRules: []

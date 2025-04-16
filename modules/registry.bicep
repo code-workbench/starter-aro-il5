@@ -1,7 +1,6 @@
 param acr_name string
 param location string
 param sku string = 'Premium'
-//param private_dns_zone_name string = 'privatelink${environment().suffixes.acrLoginServer}'
 param private_dns_zone_name string = 'privatelink.azurecr.io'
 param subnetId string
 param vnet_id string 

@@ -16,6 +16,8 @@ TEMPLATE_FILE=$(realpath ./main.bicep)
 
 echo "Deploying Bicep template..."
 
+START_TIME=$(date +%s)
+
 az deployment sub create --location $LOCATION \
     --template-file $TEMPLATE_FILE --parameters \
     project_prefix=$PROJECT_PREFIX \
@@ -29,4 +31,14 @@ az deployment sub create --location $LOCATION \
     service_principal_client_secret=$SERVICE_PRINCIPAL_CLIENT_SECRET \
     deploy_jumpbox=$DEPLOY_JUMPBOX
 
-echo "Deployment completed successfully."
+END_TIME=$(date +%s)
+
+DURATION=$((END_TIME - START_TIME))
+MINUTES=$((DURATION / 60))
+SECONDS=$((DURATION % 60))
+
+if [[ $? -eq 0 ]]; then
+    echo "Deployment completed successfully. Execution time - ${MINUTES}:${SECONDS}"
+else
+    echo "Deployment failed. Execution time - ${MINUTES}:${SECONDS}" >&2
+fi
