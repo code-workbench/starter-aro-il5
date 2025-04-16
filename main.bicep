@@ -128,7 +128,7 @@ module storage './modules/storage.bicep' = {
     vnet_id: existing_network.outputs.id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
-    key_name: storage_account_key_name
+    key_name: registry_account_key_name
     key_vault_uri: key_vault.outputs.key_vault_uri
     storage_managed_identity_id: key_vault.outputs.storage_managed_identity_id
   }

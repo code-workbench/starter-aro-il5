@@ -36,6 +36,13 @@ resource container_registry 'Microsoft.ContainerRegistry/registries@2021-06-01-p
         keyvaulturi: key_vault_uri
         keyname: key_name
       }
+      status: 'Enabled'
+      services: {
+        containerRegistry: {
+          keyType: 'Account'
+          enabled: true
+        }
+      }
     }
   }
   identity: {
