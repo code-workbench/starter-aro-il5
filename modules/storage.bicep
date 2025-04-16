@@ -24,7 +24,7 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   }
   kind: 'StorageV2'
   identity: {
-    type: 'UserAssigned' // Enable both system-assigned and user-assigned identities
+    type: 'UserAssigned'
     userAssignedIdentities: {
       '${storage_managed_identity_id}': {}
     }

@@ -5,6 +5,13 @@ param private_dns_zone_name string = 'privatelink.azurecr.io'
 param subnetId string
 param vnet_id string 
 
+// Identity Configuration:
+param registry_managed_identity_id string 
+
+// Key Vault Configuration:
+param key_vault_uri string // Key Vault URI for the customer-managed key
+param key_name string // Key name in the Key Vault
+
 param default_tag_name string
 param default_tag_value string
 
@@ -20,6 +27,22 @@ resource container_registry 'Microsoft.ContainerRegistry/registries@2021-06-01-p
   properties: {
     adminUserEnabled: false
     publicNetworkAccess: 'Disabled'
+    encryption: {
+      identity: {
+        userAssignedIdentity: registry_managed_identity_id
+      }
+      keySource: 'Microsoft.Keyvault'
+      keyvaultproperties: {
+        keyvaulturi: key_vault_uri
+        keyname: key_name
+      }
+    }
+  }
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${registry_managed_identity_id}': {}
+    }
   }
 }
 
