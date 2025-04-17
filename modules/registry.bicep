@@ -1,10 +1,18 @@
 param acr_name string
 param location string
 param sku string = 'Premium'
-//param private_dns_zone_name string = 'privatelink${environment().suffixes.acrLoginServer}'
 param private_dns_zone_name string = 'privatelink.azurecr.io'
 param subnetId string
 param vnet_id string 
+
+// Identity Configuration:
+param registry_managed_identity_id string 
+param registry_managed_identity_principal_id string 
+param registry_managed_identity_client_id string
+param registry_role_definition_id string = 'e147488a-f6f5-4113-8e2d-b22465e65bf6' // AcrKeyVaultReader role for Azure Government
+
+// Key Vault Configuration:
+param registry_key_uri string // Key Vault URI for the customer-managed key
 
 param default_tag_name string
 param default_tag_value string
@@ -18,9 +26,44 @@ resource container_registry 'Microsoft.ContainerRegistry/registries@2021-06-01-p
   sku: {
     name: sku
   }
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${registry_managed_identity_id}': {}
+    }
+  }
   properties: {
     adminUserEnabled: false
     publicNetworkAccess: 'Disabled'
+    encryption: {
+      status: 'Enabled'
+      keyVaultProperties: {
+        identity: registry_managed_identity_client_id
+        keyIdentifier: registry_key_uri
+      }
+    }
+    policies: {
+      quarantinePolicy: {
+        status: 'disabled'
+      }
+      trustPolicy: {
+        type: 'Notary'
+        status: 'disabled'
+      }
+      retentionPolicy: {
+        days: 7
+        status: 'disabled'
+      }
+    }
+  }
+}
+
+resource acr_role_assignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(container_registry.id, registry_managed_identity_id, 'AcrKeyVaultReader')
+  scope: container_registry
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', registry_role_definition_id) // AcrKeyVaultReader role
+    principalId: registry_managed_identity_principal_id
   }
 }
 

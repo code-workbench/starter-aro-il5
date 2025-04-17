@@ -6,6 +6,13 @@ param vnet_id string
 param default_tag_name string
 param default_tag_value string
 
+// Key Vault Configuration:
+param key_vault_uri string // Key Vault URI for the customer-managed key
+param key_name string // Key name in the Key Vault
+
+// Identity Configuration:
+param storage_managed_identity_id string
+
 resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   name: storage_account_name
   location: location
@@ -16,14 +23,48 @@ resource storage_account 'Microsoft.Storage/storageAccounts@2022-05-01' = {
     name: 'Standard_LRS'
   }
   kind: 'StorageV2'
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${storage_managed_identity_id}': {}
+    }
+  }
   properties: {
     publicNetworkAccess: 'Disabled'
     supportsHttpsTrafficOnly: true
     allowBlobPublicAccess: false
     allowSharedKeyAccess: false
+    encryption: {
+      identity: {
+        userAssignedIdentity: storage_managed_identity_id
+      }
+      keySource: 'Microsoft.Keyvault'
+      keyvaultproperties: {
+        keyvaulturi: key_vault_uri
+        keyname: key_name
+      }
+      services: {
+        file: {
+          keyType: 'Account'
+          enabled: true
+        }
+        table: {
+          keyType: 'Account'
+          enabled: true
+        }
+        queue: {
+          keyType: 'Account'
+          enabled: true
+        }
+        blob: {
+          keyType: 'Account'
+          enabled: true
+        }
+      }
+    }
     networkAcls: {
       defaultAction: 'Deny'
-      bypass: 'None'
+      bypass: 'AzureServices'
       ipRules: []
       virtualNetworkRules: []
       resourceAccessRules: []
@@ -97,4 +138,4 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
 output id string = storage_account.id
 output private_endpoint_id string = private_endpoint.id
 output private_dns_zone_id string = private_dns_zone.id
-output name string = storage_account.name 
+output name string = storage_account.name
