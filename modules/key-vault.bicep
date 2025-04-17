@@ -189,3 +189,7 @@ output private_dns_zone_id string = private_dns_zone.id
 output name string = key_vault.name
 output storage_managed_identity_id string = storage_managed_identity.id
 output registry_managed_identity_id string = registry_managed_identity.id
+output registry_managed_identity_client_id string = registry_managed_identity.properties.clientId
+output registry_managed_identity_principal_id string = registry_managed_identity.properties.principalId
+output storage_key_uri string = storage_key.properties.keyUri
+output registry_key_uri string = registry_key.properties.keyUri

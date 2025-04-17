@@ -112,10 +112,14 @@ module registry './modules/registry.bicep' = {
     vnet_id: existing_network.outputs.id   
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
-    key_name: storage_account_key_name
-    key_vault_uri: key_vault.outputs.key_vault_uri
+    registry_key_uri: key_vault.outputs.registry_key_uri
     registry_managed_identity_id: key_vault.outputs.registry_managed_identity_id
+    registry_managed_identity_principal_id: key_vault.outputs.registry_managed_identity_principal_id
+    registry_managed_identity_client_id: key_vault.outputs.registry_managed_identity_client_id
   }
+  dependsOn: [
+    key_vault
+  ]
 }
 
 module storage './modules/storage.bicep' = {
@@ -128,7 +132,7 @@ module storage './modules/storage.bicep' = {
     vnet_id: existing_network.outputs.id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
-    key_name: registry_account_key_name
+    key_name: storage_account_key_name
     key_vault_uri: key_vault.outputs.key_vault_uri
     storage_managed_identity_id: key_vault.outputs.storage_managed_identity_id
   }
