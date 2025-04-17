@@ -158,30 +158,30 @@ module key_vault './modules/key-vault.bicep' = {
   }
 }
 
-// module aro './modules/aro.bicep' = {
-//   name: 'aro'
-//   scope: aro_resource_group
-//   params: {
-//     aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
-//     location: location
-//     project_prefix: project_prefix
-//     env_prefix: env_prefix
-//     control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
-//     worker_subnet_id: existing_network.outputs.worker_subnet_id
-//     control_plane_vm_size: control_plane_vm_size
-//     pool_cluster_size: pool_cluster_size
-//     pool_cluster_disk_size: pool_cluster_disk_size
-//     pool_cluster_count: pool_cluster_count
-//     service_cidr: service_cidr
-//     pod_cidr: pod_cidr
-//     cluster_domain: 'aro-${project_prefix}-${env_prefix}'
-//     service_principal_client_id: service_principal_client_id
-//     service_principal_client_secret: service_principal_client_secret
-//     redhat_pull_secret: redhat_pull_secret
-//     default_tag_name: default_tag_name
-//     default_tag_value: default_tag_value
-//   }
-// }
+module aro './modules/aro.bicep' = {
+  name: 'aro'
+  scope: aro_resource_group
+  params: {
+    aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
+    location: location
+    project_prefix: project_prefix
+    env_prefix: env_prefix
+    control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
+    worker_subnet_id: existing_network.outputs.worker_subnet_id
+    control_plane_vm_size: control_plane_vm_size
+    pool_cluster_size: pool_cluster_size
+    pool_cluster_disk_size: pool_cluster_disk_size
+    pool_cluster_count: pool_cluster_count
+    service_cidr: service_cidr
+    pod_cidr: pod_cidr
+    cluster_domain: 'aro-${project_prefix}-${env_prefix}'
+    service_principal_client_id: service_principal_client_id
+    service_principal_client_secret: service_principal_client_secret
+    redhat_pull_secret: redhat_pull_secret
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+  }
+}
 
 // TODO: Adding Jumpbox module
 
