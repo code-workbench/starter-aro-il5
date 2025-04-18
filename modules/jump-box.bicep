@@ -27,7 +27,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
     ]
   }
   tags: {
-    default_tag_name: default_tag_value
+    '${default_tag_name}': default_tag_value
   }
 }
 
@@ -63,7 +63,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
   }
   tags: {
-    default_tag_name: default_tag_value
+    '${default_tag_name}': default_tag_value
   }
   dependsOn: [
     networkInterface
