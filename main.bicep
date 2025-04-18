@@ -190,7 +190,7 @@ module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
   name: 'jumpbox'
   scope: network_resource_group
   params: {
-    jumpbox_name: '${project_prefix}-${env_prefix}-jumpbox'
+    jumpbox_name: '${project_prefix}-${env_prefix}-jb'
     location: location
     admin_username: jumpbox_username
     admin_password: jumpbox_password
