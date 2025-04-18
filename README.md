@@ -103,7 +103,7 @@ Below is an example configuration that you can use to populate your environment 
 
 ```json
 {
-    "resourceGroupName": "starter-aro-il5",
+    "networkResourceGroupName": "starter-aro-il5",
     "vnetName": "starter-aro-il5-vnet",
     "location": "usgovvirginia",
     "subnetName": "default",
@@ -112,7 +112,11 @@ Below is an example configuration that you can use to populate your environment 
     "defaultTagName": "Environment",
     "defaultTagValue": "dev",
     "servicePrincipalClientId": "",
-    "servicePrincipalClientSecret": ""
+    "servicePrincipalClientSecret": "",
+    "subscriptionId":"",
+    "deployJumpBox": false,
+    "jumpboxUsername": "",
+    "jumpboxPassword": ""
 }
 ```
 
@@ -127,6 +131,10 @@ The values are:
 **defaultTagValue:** The value of the tag to be applied to all resources on the environment. 
 **servicePrincipalClientId:** The Client ID of the Service Principal required for ARO.
 **servicePrincipalClientSecret:** The Client Secret of the Service Principal required for ARO.  
+**subscriptionId:** The subscription id being deployed to.
+**deployJumpBox:** True / False for deploying a jumpbox with bastion.
+**jumpboxUsername:** The username for accessing the jumpbox.  
+**jumpboxPassword:** The password for accessing the jumpbox.  
 
 Make sure to replace the `servicePrincipalClientId` and `servicePrincipalClientSecret` with the values from your created service principal.
 
@@ -207,38 +215,13 @@ You can leverage the following to deploy this template to your environment:
 **NOTE: This requires the an existing virtual network to deploy.  To Create one, use the following:**
 
 ```bash
-RESOURCE_GROUP_NAME="starter-aro-il5"
-VNET_NAME="starter-aro-il5-vnet"
-LOCATION="usgovvirginia"
-SUBNET_NAME="default"
-
-# Create the resource group
-az group create --name $RESOURCE_GROUP_NAME --location $LOCATION
-
-# Create the virtual network
-az network vnet create --name $VNET_NAME --resource-group $RESOURCE_GROUP_NAME --subnet-name $SUBNET_NAME
+bash ./scripts/create-rg-vnet.sh
 ```
 
 **NOTE: You will need to give your service principal and the "Azure Open Shift RP" service principal "Network Contributor" rights.**
 
 ```bash
-PROJECT_PREFIX="aroil5"
-ENV_PREFIX="dev"
-DEFAULT_TAG_NAME="Environment"
-DEFAULT_TAG_VALUE="aro-il5"
-SERVICE_PRINCIPAL_CLIENT_ID=""
-SERVICE_PRINCIPAL_CLIENT_SECRET=""
-
-az deployment group create --resource-group $RESOURCE_GROUP_NAME \
-    --template-file $TEMPLATE_FILE --parameters \
-    project_prefix=$PROJECT_PREFIX \
-    env_prefix=$ENV_PREFIX \
-    location=$LOCATION \
-    existing_network_name=$VNET_NAME \
-    default_tag_name=$DEFAULT_TAG_NAME \
-    default_tag_value=$DEFAULT_TAG_VALUE \
-    service_principal_client_id=$SERVICE_PRINCIPAL_CLIENT_ID \
-    service_principal_client_secret=$SERVICE_PRINCIPAL_CLIENT_SECRET
+bash ./scripts/deploy-template.sh
 ```
 
 # Delete Infrastructure
@@ -246,5 +229,5 @@ az deployment group create --resource-group $RESOURCE_GROUP_NAME \
 If you need to clean up the infrastructure, you can do so by running the following:
 
 ```bash
-az group delete --name $RESOURCE_GROUP_NAME -y
+bash ./scripts/delete-rg.sh
 ```
