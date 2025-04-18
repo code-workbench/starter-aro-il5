@@ -149,4 +149,4 @@ output jumpbox_subnet_id string = jumpbox_subnet.id
 output registry_subnet_id string = registry_subnet.id
 output key_vault_subnet_id string = keyvault_subnet.id
 output bastion_subnet_id string = bastion_subnet.id
-output bastion_pip_id string = bastion_pip.id
+// output bastion_pip_id string = bastion_pip.id

@@ -85,6 +85,11 @@ resource aro_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   location: location
 }
 
+resource aro_jumpbox_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: '${project_prefix}-${env_prefix}-jumpbox'
+  location: location
+}
+
 //Deploy into a existing network
 module existing_network './modules/network.bicep' = {
   name: 'existing-network'
@@ -188,7 +193,7 @@ module key_vault './modules/key-vault.bicep' = {
 
 module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
   name: 'jumpbox'
-  scope: network_resource_group
+  scope: aro_jumpbox_resource_group
   params: {
     jumpbox_name: '${project_prefix}-${env_prefix}-jb'
     location: location
