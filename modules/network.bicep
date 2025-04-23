@@ -85,7 +85,7 @@ resource jumpbox_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' =
     addressPrefix: jumpbox_cidr
   }
   dependsOn: [
-    virtual_network
+    virtual_network, keyvault_subnet
   ]
 }
 
@@ -111,6 +111,9 @@ resource bastion_pip 'Microsoft.Network/publicIPAddresses@2023-09-01' = if (depl
   properties: {
     publicIPAllocationMethod: 'Static'
   }
+  dependsOn: [
+    bastion_subnet
+  ]
 }
 
 // Bastion Host
@@ -132,6 +135,9 @@ resource bastion_host 'Microsoft.Network/bastionHosts@2023-09-01' = if (deploy_j
       }
     ]
   }
+  dependsOn: [
+    bastion_subnet, bastion_pip
+  ]
 }
 
 output id string = virtual_network.id
@@ -143,4 +149,4 @@ output jumpbox_subnet_id string = jumpbox_subnet.id
 output registry_subnet_id string = registry_subnet.id
 output key_vault_subnet_id string = keyvault_subnet.id
 output bastion_subnet_id string = bastion_subnet.id
-output bastion_pip_id string = bastion_pip.id
+// output bastion_pip_id string = bastion_pip.id

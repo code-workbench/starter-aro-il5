@@ -51,6 +51,9 @@ param service_principal_client_secret string
 
 // Jumpbox Configuration
 param deploy_jumpbox bool = false
+param jumpbox_username string = 'azureuser'
+@secure()
+param jumpbox_password string 
 
 // Redhat Configuration:
 @secure()
@@ -79,6 +82,11 @@ resource shared_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' =
 
 resource aro_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: '${project_prefix}-${env_prefix}-aro'
+  location: location
+}
+
+resource aro_jumpbox_resource_group 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: '${project_prefix}-${env_prefix}-jumpbox'
   location: location
 }
 
@@ -183,7 +191,22 @@ module aro './modules/aro.bicep' = {
   }
 }
 
-// TODO: Adding Jumpbox module
+module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
+  name: 'jumpbox'
+  scope: aro_jumpbox_resource_group
+  params: {
+    jumpbox_name: '${project_prefix}-${env_prefix}-jb'
+    location: location
+    admin_username: jumpbox_username
+    admin_password: jumpbox_password
+    jumpbox_subnet_id: existing_network.outputs.jumpbox_subnet_id
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+  }
+  dependsOn: [
+    existing_network
+  ]
+}
 
 output registry_id string = registry.outputs.id
 // output storage_id string = storage.outputs.id

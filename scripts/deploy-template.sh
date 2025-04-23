@@ -29,6 +29,8 @@ az deployment sub create --location $LOCATION \
     default_tag_value=$DEFAULT_TAG_VALUE \
     service_principal_client_id=$SERVICE_PRINCIPAL_CLIENT_ID \
     service_principal_client_secret=$SERVICE_PRINCIPAL_CLIENT_SECRET \
+    jumpbox_username=$JUMPBOX_USERNAME \
+    jumpbox_password=$JUMPBOX_PASSWORD \
     deploy_jumpbox=$DEPLOY_JUMPBOX
 
 END_TIME=$(date +%s)

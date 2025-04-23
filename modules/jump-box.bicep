@@ -27,7 +27,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
     ]
   }
   tags: {
-    default_tag_name: default_tag_value
+    '${default_tag_name}': default_tag_value
   }
 }
 
@@ -39,7 +39,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       vmSize: 'Standard_DS1_v2'
     }
     osProfile: {
-      computerName: '${jumpbox_name}-jumpbox'
+      computerName: jumpbox_name
       adminUsername: admin_username
       adminPassword: admin_password
     }
@@ -63,7 +63,7 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
     }
   }
   tags: {
-    default_tag_name: default_tag_value
+    '${default_tag_name}': default_tag_value
   }
   dependsOn: [
     networkInterface

@@ -32,6 +32,8 @@ load_parameters() {
         SERVICE_PRINCIPAL_CLIENT_SECRET=$(jq -r '.servicePrincipalClientSecret' $CONFIG_JSON)
         SUBSCRIPTION_ID=$(jq -r '.subscriptionId' $CONFIG_JSON)
         DEPLOY_JUMPBOX=$(jq -r '.deployJumpBox' $CONFIG_JSON)
+        JUMPBOX_USERNAME=$(jq -r '.jumpboxUsername' $CONFIG_JSON)
+        JUMPBOX_PASSWORD=$(jq -r '.jumpboxPassword' $CONFIG_JSON)
         
         output_parameters
     else 
@@ -53,6 +55,7 @@ output_parameters() {
     echo "Service Principal Client ID: $SERVICE_PRINCIPAL_CLIENT_ID"
     echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Deploy JumpBox: $DEPLOY_JUMPBOX"
+    echo "JumpBox Username: $JUMPBOX_USERNAME"
     echo "--------------------------------"
 }
 

@@ -10,5 +10,7 @@
     "servicePrincipalClientId": "",
     "servicePrincipalClientSecret": "",
     "subscriptionId":"",
-    "deployJumpBox": false
+    "deployJumpBox": false,
+    "jumpboxUsername": "",
+    "jumpboxPassword": ""
 }
