@@ -15,6 +15,7 @@ param key_vault_cidr string = '10.0.4.0/24'
 param storage_cidr string = '10.0.5.0/24'
 param jumpbox_cidr string = '10.0.6.0/24'
 param bastion_cidr string = '10.0.7.0/24'
+param app_gateway_cidr string = '10.0.8.0/24'
 
 param deploy_jumpbox bool = false
 
@@ -97,6 +98,18 @@ resource bastion_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' =
     addressPrefix: bastion_cidr
   }
   dependsOn: [
+    virtual_network, app_gateway_subnet
+  ]
+}
+
+// Bastion Subnet
+resource app_gateway_subnet 'Microsoft.Network/virtualNetworks/subnets@2023-09-01' = {
+  name: '${project_prefix}-${env_prefix}-app-gateway'
+  parent: virtual_network 
+  properties: {
+    addressPrefix: app_gateway_cidr
+  }
+  dependsOn: [
     virtual_network, jumpbox_subnet
   ]
 }
@@ -149,4 +162,5 @@ output jumpbox_subnet_id string = jumpbox_subnet.id
 output registry_subnet_id string = registry_subnet.id
 output key_vault_subnet_id string = keyvault_subnet.id
 output bastion_subnet_id string = bastion_subnet.id
+output app_gateway_subnet_id string = app_gateway_subnet.id
 // output bastion_pip_id string = bastion_pip.id

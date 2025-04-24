@@ -26,7 +26,8 @@ param registry_cidr string = '10.0.192.0/18'
 param key_vault_cidr string = '10.1.0.0/18'
 param storage_cidr string = '10.1.64.0/18'
 param jumpbox_cidr string = '10.1.128.0/18'
-param bastion_cidr string = '10.1.192.0/18'
+param bastion_cidr string = '10.1.192.0/20'
+param app_gateway_cidr string = '10.1.208.0/20'
 
 // Key Configuration:
 param storage_account_key_name string = 'storage-key'
@@ -106,6 +107,7 @@ module existing_network './modules/network.bicep' = {
     storage_cidr: storage_cidr
     jumpbox_cidr: jumpbox_cidr
     bastion_cidr: bastion_cidr
+    app_gateway_cidr: app_gateway_cidr
     deploy_jumpbox: deploy_jumpbox
   }
 }
@@ -163,33 +165,54 @@ module key_vault './modules/key-vault.bicep' = {
     storage_account_key_name: storage_account_key_name
     registry_managed_identity_name: registry_account_managed_identity_name
     registry_account_key_name: registry_account_key_name
+    certificate_common_name: 'aro-${project_prefix}-${env_prefix}'
   }
 }
 
-module aro './modules/aro.bicep' = {
-  name: 'aro'
-  scope: aro_resource_group
-  params: {
-    aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
-    location: location
-    project_prefix: project_prefix
-    env_prefix: env_prefix
-    control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
-    worker_subnet_id: existing_network.outputs.worker_subnet_id
-    control_plane_vm_size: control_plane_vm_size
-    pool_cluster_size: pool_cluster_size
-    pool_cluster_disk_size: pool_cluster_disk_size
-    pool_cluster_count: pool_cluster_count
-    service_cidr: service_cidr
-    pod_cidr: pod_cidr
-    cluster_domain: 'aro-${project_prefix}-${env_prefix}'
-    service_principal_client_id: service_principal_client_id
-    service_principal_client_secret: service_principal_client_secret
-    redhat_pull_secret: redhat_pull_secret
-    default_tag_name: default_tag_name
-    default_tag_value: default_tag_value
-  }
-}
+// module aro './modules/aro.bicep' = {
+//   name: 'aro'
+//   scope: aro_resource_group
+//   params: {
+//     aro_cluster_name: '${project_prefix}-${env_prefix}-aro'
+//     location: location
+//     project_prefix: project_prefix
+//     env_prefix: env_prefix
+//     control_plane_subnet_id: existing_network.outputs.control_plane_subnet_id
+//     worker_subnet_id: existing_network.outputs.worker_subnet_id
+//     control_plane_vm_size: control_plane_vm_size
+//     pool_cluster_size: pool_cluster_size
+//     pool_cluster_disk_size: pool_cluster_disk_size
+//     pool_cluster_count: pool_cluster_count
+//     service_cidr: service_cidr
+//     pod_cidr: pod_cidr
+//     cluster_domain: 'aro-${project_prefix}-${env_prefix}'
+//     service_principal_client_id: service_principal_client_id
+//     service_principal_client_secret: service_principal_client_secret
+//     redhat_pull_secret: redhat_pull_secret
+//     default_tag_name: default_tag_name
+//     default_tag_value: default_tag_value
+//   }
+// }
+
+// module app_gateway './modules/app-gateway.bicep' = {
+//   name: 'app-gateway'
+//   scope: shared_resource_group
+//   params: {
+//     app_gateway_name: '${project_prefix}-${env_prefix}-agw'
+//     location: location
+//     app_gateway_subnet_id: existing_network.outputs.app_gateway_subnet_id
+//     publicIpName: '${project_prefix}-${env_prefix}-agw-pip'
+//     sku_name: 'WAF_v2'
+//     capacity: 2
+//     aro_cluster_domain: 'aro-${project_prefix}-${env_prefix}'
+//     ssl_certificate_id: key_vault.outputs.app_gateway_ssl_cert_id
+//     default_tag_name: default_tag_name
+//     default_tag_value: default_tag_value
+//   }
+//   dependsOn: [
+//     key_vault
+//   ]
+// }
 
 module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
   name: 'jumpbox'
@@ -209,7 +232,7 @@ module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
 }
 
 output registry_id string = registry.outputs.id
-// output storage_id string = storage.outputs.id
+output storage_id string = storage.outputs.id
 output key_vault_id string = key_vault.outputs.id
 output subnet_control_plane_id string = existing_network.outputs.control_plane_subnet_id
 output subnet_worker_id string = existing_network.outputs.worker_subnet_id
