@@ -152,21 +152,6 @@ resource private_dns_zone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   }
 }
 
-resource ssl_certificate 'Microsoft.Web/certificates@2024-04-01' = {
-  name: certificate_name
-  location: location
-  properties: {
-    keyVaultId: key_vault.id
-    keyVaultSecretName: certificate_name
-    canonicalName: certificate_common_name
-    hostNames: [
-      certificate_common_name
-    ]
-    pfxBlob: ''
-    password: ''
-  }
-}
-
 resource private_endpoint 'Microsoft.Network/privateEndpoints@2022-05-01' = {
   name: '${key_vault.name}-pe'
   location: location
@@ -235,4 +220,3 @@ output app_gateway_managed_identity_client_id string = app_gateway_managed_ident
 output app_gateway_managed_identity_principal_id string = app_gateway_managed_identity.properties.principalId
 output storage_key_uri string = storage_key.properties.keyUri
 output registry_key_uri string = registry_key.properties.keyUri
-output app_gateway_ssl_cert_id string = ssl_certificate.id
