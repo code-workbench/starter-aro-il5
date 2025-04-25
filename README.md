@@ -203,9 +203,11 @@ For this project, we have implemented vscode tasks for common operations to make
 To run this tasks, you can click "F1" or "Ctrl+Shift+P" or go to "Terminal" => "Run Task".
 
 The following menu will appear:
+
 ![alt text](./images/run-task.png)
 
 And then select your task:
+
 ![alt text](./images/select-tasks.png)
 
 ## Deploy template manually
