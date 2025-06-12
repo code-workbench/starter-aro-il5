@@ -62,6 +62,7 @@ graph TB
     end
 ```
 
+This repo is designed to be deployed to an existing virtual network, and will modify the network to support the required subnets.  
 
 # Installing Azure CLI
 
