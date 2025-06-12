@@ -1,11 +1,67 @@
 # Starter Azure RedHat OpenShift for IL5
 Infrastructure-as-Code template for Deploying Azure RedHat OpenShift in an IL5 environment.  The goal being to provide a starter template for getting an environment created and providing all the baseline controls.  
 
-# Deploy directy from this readme
+# What is included in this template?
 
-You can deploy this template directly to Azure Government by clicking the button below:
+This template includes the following infrastructure components:
 
-[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fkm%2Fmain%2Fmain.bicep)
+```mermaid
+graph TB
+    subgraph "Subscription"
+        NET_RG[Network Resource Group]
+        SHARED_RG["Shared Resource Group<br>(project-env-shared)"]
+        ARO_RG["ARO Resource Group<br>(project-env-aro)"]
+        JB_RG["Jumpbox Resource Group<br>(project-env-jumpbox)"]
+        
+        subgraph NET_RG
+            VNET["Virtual Network<br>(Existing)"]
+            
+            subgraph "Subnets"
+                CP_SUB["Control Plane Subnet<br>(10.0.64.0/18)"]
+                W_SUB["Worker Subnet<br>(10.0.128.0/18)"]
+                REG_SUB["Registry Subnet<br>(10.0.192.0/18)"]
+                KV_SUB["Key Vault Subnet<br>(10.1.0.0/18)"]
+                STG_SUB["Storage Subnet<br>(10.1.64.0/18)"]
+                JB_SUB["Jumpbox Subnet<br>(10.1.128.0/18)"]
+                BST_SUB["Bastion Subnet<br>(10.1.192.0/18)"]
+            end
+        end
+        
+        subgraph SHARED_RG
+            KV["Key Vault<br>(with CMK)"]
+            ACR["Container Registry<br>(Premium)"]
+            STG["Storage Account"]
+            
+            MI_STG["Storage Managed Identity"]
+            MI_REG["Registry Managed Identity"]
+            
+            KV --> MI_STG
+            KV --> MI_REG
+            ACR --> MI_REG
+            STG --> MI_STG
+        end
+        
+        subgraph ARO_RG
+            ARO["Azure RedHat OpenShift Cluster"]
+        end
+        
+        subgraph JB_RG
+            JB["Jumpbox VM<br>(Optional)"]
+            BASTION["Azure Bastion"]
+        end
+        
+        %% Connections
+        CP_SUB --> ARO
+        W_SUB --> ARO
+        REG_SUB --> ACR
+        KV_SUB --> KV
+        STG_SUB --> STG
+        JB_SUB --> JB
+        BST_SUB --> BASTION
+        BASTION --> JB
+    end
+```
+
 
 # Installing Azure CLI
 
@@ -78,6 +134,12 @@ The following is the command to login.
 
 ```bash
 az login
+```
+
+or if you need to open the window on another machine (linux for example):
+
+```bash
+az login --use-device-code
 ```
 
 # Pre-requisites
@@ -179,17 +241,10 @@ The following are key network considerations for deploying Azure RedHat OpenShif
 
 For this, we have 3 options for deploying this template:
 
-1. Deploy directly from this readme.
 1. Deploy using vscode tasks
 1. Deploy manually
 
 **NOTE: This deployment can take around 60 minutes to deploy into your environment.**
-
-## Deploy directy from this readme
-
-You can deploy this template directly to Azure Government by clicking the button below:
-
-[![Deploy to Azure Government](https://aka.ms/deploytoazuregovbutton)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmack-bytes-government%2Fstarter-aro-il5%2Frefs%2Fheads%2Fkm%2Fmain%2Fmain.bicep)
 
 ## Deploy using vscode tasks
 
@@ -203,10 +258,10 @@ For this project, we have implemented vscode tasks for common operations to make
 To run this tasks, you can click "F1" or "Ctrl+Shift+P" or go to "Terminal" => "Run Task".
 
 The following menu will appear:
-![alt text](./images/run-task.png)
+![Open the command palette and select run task](./images/run-task.png)
 
 And then select your task:
-![alt text](./images/select-tasks.png)
+![Choose a task from the list below](./images/select-tasks.png)
 
 ## Deploy template manually
 
