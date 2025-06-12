@@ -1,6 +1,8 @@
 # Starter Azure RedHat OpenShift for IL5
 Infrastructure-as-Code template for Deploying Azure RedHat OpenShift in an IL5 environment.  The goal being to provide a starter template for getting an environment created and providing all the baseline controls.  
 
+[![Deploy to Azure Government](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazuregov.svg?sanitize=true)](https://portal.azure.us/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fcode-workbench%2Fstarter-aro-il5%2Fmain%2Fmain.bicep)
+
 # What is included in this template?
 
 This template includes the following infrastructure components:
