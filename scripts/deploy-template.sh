@@ -12,7 +12,7 @@ else
     parse_passed_parameters "$@"
 fi
 
-TEMPLATE_FILE=$(realpath ./main.bicep)
+TEMPLATE_FILE=$(realpath ./aro.bicep)
 
 echo "Deploying Bicep template..."
 
@@ -31,7 +31,8 @@ az deployment sub create --location $LOCATION \
     service_principal_client_secret=$SERVICE_PRINCIPAL_CLIENT_SECRET \
     jumpbox_username=$JUMPBOX_USERNAME \
     jumpbox_password=$JUMPBOX_PASSWORD \
-    deploy_jumpbox=$DEPLOY_JUMPBOX
+    deploy_jumpbox=$DEPLOY_JUMPBOX \
+    custom_managed_image_id=$CUSTOM_MANAGED_IMAGE_ID
 
 END_TIME=$(date +%s)
 
