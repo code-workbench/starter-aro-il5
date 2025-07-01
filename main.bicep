@@ -64,6 +64,10 @@ param pool_cluster_size string = 'Standard_D8s_v3'
 param pool_cluster_disk_size int = 128
 param pool_cluster_count int = 3
 
+// Optional Custom Managed Image
+@description('The ID of a custom managed image to use for the ARO cluster')
+param custom_managed_image_id string = ''
+
 // Tag Configuration:
 param default_tag_name string
 param default_tag_value string
@@ -199,6 +203,7 @@ module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
     location: location
     admin_username: jumpbox_username
     admin_password: jumpbox_password
+    custom_managed_image_id: custom_managed_image_id
     jumpbox_subnet_id: existing_network.outputs.jumpbox_subnet_id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value

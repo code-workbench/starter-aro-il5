@@ -34,6 +34,7 @@ load_parameters() {
         DEPLOY_JUMPBOX=$(jq -r '.deployJumpBox' $CONFIG_JSON)
         JUMPBOX_USERNAME=$(jq -r '.jumpboxUsername' $CONFIG_JSON)
         JUMPBOX_PASSWORD=$(jq -r '.jumpboxPassword' $CONFIG_JSON)
+        CUSTOM_MANAGED_IMAGE_ID=$(jq -r '.custom_managed_image_id' $CONFIG_JSON)
         
         output_parameters
     else 
@@ -56,6 +57,7 @@ output_parameters() {
     echo "Subscription ID: $SUBSCRIPTION_ID"
     echo "Deploy JumpBox: $DEPLOY_JUMPBOX"
     echo "JumpBox Username: $JUMPBOX_USERNAME"
+    echo "Custom Managed Image ID: $CUSTOM_MANAGED_IMAGE_ID"
     echo "--------------------------------"
 }
 
