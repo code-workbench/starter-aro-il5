@@ -143,6 +143,60 @@ or if you need to open the window on another machine (linux for example):
 az login --use-device-code
 ```
 
+# OPTIONAL - Create a vm image for a kubernetes jumpbox
+
+As part of this repo, there is a packer script for creating a jumpbox on ubuntu 22.04-LTS that has several common tools for working with Kubernetes enabled.  The file can be found:
+
+- **[kubernetes-linux-jumpbox.pkr.hcl](./custom-images/kubernetes-linux-jumpbox.pkr.hcl): This machine provides a jumpbox for accessing and working with kubernetes clusters.  
+
+If you wish to build the image, the following steps can be used.
+
+## Build packer vm images:
+
+To build a VM image in your Azure subscription using the `./custom-images/kubernetes-linux-jumpbox.pkr.hcl` file, follow these steps:
+
+1. **Install Packer**  
+  Make sure you have [Packer](https://developer.hashicorp.com/packer/install) installed on your machine. You can run this script to install it or use the repo task by hitting F1.
+
+  ```bash
+  bash ./scripts/install-packer.sh
+  ```
+
+2. **Authenticate with Azure**  
+  Ensure you are logged in to Azure CLI and have the necessary permissions:
+  ```bash
+  az cloud set --name AzureUSGovernment
+  az login --use-device-code
+  az account set --subscription "<your-subscription-id>"
+  ```
+
+**NOTE: There is a task in this repo that can be executed to perform this build using values in the environment.json file**
+
+3. **Run Packer init**
+  Run the following command to validate your Packer template:
+  ```bash
+  packer init ./custom-images/kubernetes-linux-jumpbox.pkr.hcl
+  ```
+
+3. **Validate the Packer Template**  
+  Run the following command to validate your Packer template:
+  ```bash
+  packer validate ./custom-images/kubernetes-linux-jumpbox.pkr.hcl
+  ```
+
+4. **Build the Image**  
+  Execute the build command:
+  ```bash
+  packer build -var "subscription_id=<your-subscription-id>" -var "location=<your-location>" ./custom-images/kubernetes-linux-jumpbox.pkr.hcl
+  ```
+
+5. **Locate the Image in Azure**  
+  After the build completes, the image will be available in the resource group and location specified in your Packer template.
+
+> For more details, see the [Packer Azure Builder documentation](https://developer.hashicorp.com/packer/plugins/builders/azure).
+
+You will need to get the "ManagedImageId" for the newly created image if you want to use it in the deployment.  
+
 # Pre-requisites
 
 The following are pre-reqs for using this repo.
@@ -179,7 +233,8 @@ Below is an example configuration that you can use to populate your environment 
     "subscriptionId":"",
     "deployJumpBox": false,
     "jumpboxUsername": "",
-    "jumpboxPassword": ""
+    "jumpboxPassword": "",
+    "custom_managed_image_id": ""
 }
 ```
 
@@ -198,6 +253,7 @@ The values are:
 **deployJumpBox:** True / False for deploying a jumpbox with bastion.
 **jumpboxUsername:** The username for accessing the jumpbox.  
 **jumpboxPassword:** The password for accessing the jumpbox.  
+**custom_managed_image_id:** Can be updated to point a custom image for the jumpbox.  
 
 Make sure to replace the `servicePrincipalClientId` and `servicePrincipalClientSecret` with the values from your created service principal.
 
