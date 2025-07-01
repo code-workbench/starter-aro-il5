@@ -81,6 +81,22 @@
                 "close": false
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Build jumpbox image",
+            "type": "shell",
+            "command": "./scripts/build-jumpbox-image.sh",
+            "args": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "close": false
+            },
+            "problemMatcher": []
         }
     ]
 }
