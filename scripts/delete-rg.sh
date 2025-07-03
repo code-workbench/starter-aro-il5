@@ -13,9 +13,9 @@ else
 fi
 
 # Delete the resource group
-echo "Deleting ARO resource group..."
-az group delete --name "$PROJECT_PREFIX-$ENV_PREFIX-aro-infra" --yes
-echo "ARO resource group '$PROJECT_PREFIX-$ENV_PREFIX-aro-infra' deleted successfully."
+echo "Deleting infra resource group..."
+az group delete --name "$PROJECT_PREFIX-$ENV_PREFIX-aro" --yes
+echo "Infra resource group '$PROJECT_PREFIX-$ENV_PREFIX-aro' deleted successfully."
 
 echo "Deleting shared resource group..."
 az group delete --name "$PROJECT_PREFIX-$ENV_PREFIX-shared" --yes
