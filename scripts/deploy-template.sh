@@ -14,11 +14,15 @@ fi
 
 TEMPLATE_FILE=$(realpath ./aro.bicep)
 
-echo "Deploying Bicep template..."
+# Generate a random suffix for deployment name to prevent collisions
+RANDOM_SUFFIX=$(openssl rand -hex 4)
+DEPLOYMENT_NAME="aro-deployment-${RANDOM_SUFFIX}"
+
+echo "Deploying Bicep template with name: $DEPLOYMENT_NAME"
 
 START_TIME=$(date +%s)
 
-az deployment sub create --location $LOCATION \
+az deployment sub create --name $DEPLOYMENT_NAME --location $LOCATION \
     --template-file $TEMPLATE_FILE --parameters \
     project_prefix=$PROJECT_PREFIX \
     network_rg_name=$NETWORK_RESOURCE_GROUP_NAME \
