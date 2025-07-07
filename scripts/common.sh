@@ -78,3 +78,163 @@ parse_passed_parameters() {
 
     output_parameters
 }
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to print colored output
+print_status() {
+    local color=$1
+    local message=$2
+    echo -e "${color}${message}${NC}"
+}
+
+# Function to check deployment status for a resource group
+check_deployment_status() {
+    local resource_group=$1
+    local rg_type=$2
+    
+    print_status $BLUE "Checking deployment status for: $resource_group ($rg_type)"
+    echo "============================================="
+    
+    # Check if resource group exists
+    if ! az group show --name "$resource_group" &>/dev/null; then
+        print_status $RED "❌ Resource group '$resource_group' does not exist"
+        echo ""
+        return 1
+    fi
+    
+    print_status $GREEN "✅ Resource group '$resource_group' exists"
+    
+    # Get deployment history
+    local deployments=$(az deployment group list --resource-group "$resource_group" --query '[].{name:name, provisioningState:properties.provisioningState, timestamp:properties.timestamp}' --output table 2>/dev/null)
+    
+    if [[ -z "$deployments" || "$deployments" == "[]" ]]; then
+        print_status $YELLOW "⚠️  No deployments found in resource group '$resource_group'"
+    else
+        echo ""
+        print_status $BLUE "Recent deployments:"
+        echo "$deployments"
+        
+        # Get the latest deployment status
+        local latest_deployment=$(az deployment group list --resource-group "$resource_group" --query '[0].{name:name, state:properties.provisioningState, timestamp:properties.timestamp}' --output json 2>/dev/null)
+        
+        if [[ -n "$latest_deployment" && "$latest_deployment" != "null" ]]; then
+            local deployment_name=$(echo "$latest_deployment" | jq -r '.name')
+            local deployment_state=$(echo "$latest_deployment" | jq -r '.state')
+            local deployment_time=$(echo "$latest_deployment" | jq -r '.timestamp')
+            
+            echo ""
+            print_status $BLUE "Latest deployment details:"
+            echo "Name: $deployment_name"
+            echo "State: $deployment_state"
+            echo "Timestamp: $deployment_time"
+            
+            case "$deployment_state" in
+                "Succeeded")
+                    print_status $GREEN "✅ Latest deployment succeeded"
+                    ;;
+                "Failed")
+                    print_status $RED "❌ Latest deployment failed"
+                    # Get error details
+                    local error_details=$(az deployment group show --resource-group "$resource_group" --name "$deployment_name" --query 'properties.error' --output json 2>/dev/null)
+                    if [[ -n "$error_details" && "$error_details" != "null" ]]; then
+                        echo ""
+                        print_status $RED "Error details:"
+                        echo "$error_details" | jq -r '.message // "No error message available"'
+                    fi
+                    ;;
+                "Running")
+                    print_status $YELLOW "⏳ Deployment is currently running"
+                    ;;
+                "Canceled")
+                    print_status $YELLOW "⚠️  Deployment was canceled"
+                    ;;
+                *)
+                    print_status $YELLOW "⚠️  Deployment state: $deployment_state"
+                    ;;
+            esac
+        fi
+    fi
+    
+    # List resources in the resource group
+    echo ""
+    print_status $BLUE "Resources in resource group:"
+    local resources=$(az resource list --resource-group "$resource_group" --query '[].{name:name, type:type, location:location}' --output table 2>/dev/null)
+    
+    if [[ -z "$resources" || "$resources" == "[]" ]]; then
+        print_status $YELLOW "⚠️  No resources found in resource group '$resource_group'"
+    fi
+    
+    echo ""
+    echo "============================================="
+    echo ""
+}
+
+# Function to display summary
+display_summary() {
+    local shared_rg=$1
+    local aro_rg=$2
+    local jumpbox_rg=$3
+    local network_rg=$4
+    
+    print_status $BLUE "DEPLOYMENT STATUS SUMMARY"
+    echo "============================================="
+    
+    # Check each resource group and track overall status
+    local overall_status="SUCCESS"
+    
+    for rg in "$shared_rg" "$aro_rg" "$jumpbox_rg" "$network_rg"; do
+        if az group show --name "$rg" &>/dev/null; then
+            local latest_state=$(az deployment group list --resource-group "$rg" --query '[0].properties.provisioningState' --output tsv 2>/dev/null)
+            case "$latest_state" in
+                "Succeeded")
+                    print_status $GREEN "✅ $rg: Deployment succeeded"
+                    ;;
+                "Failed")
+                    print_status $RED "❌ $rg: Deployment failed"
+                    overall_status="FAILED"
+                    ;;
+                "Running")
+                    print_status $YELLOW "⏳ $rg: Deployment in progress"
+                    overall_status="IN_PROGRESS"
+                    ;;
+                "")
+                    print_status $YELLOW "⚠️  $rg: No deployments found"
+                    if [[ "$overall_status" == "SUCCESS" ]]; then
+                        overall_status="WARNING"
+                    fi
+                    ;;
+                *)
+                    print_status $YELLOW "⚠️  $rg: Status unknown ($latest_state)"
+                    if [[ "$overall_status" == "SUCCESS" ]]; then
+                        overall_status="WARNING"
+                    fi
+                    ;;
+            esac
+        else
+            print_status $RED "❌ $rg: Resource group does not exist"
+            overall_status="FAILED"
+        fi
+    done
+    
+    echo ""
+    case "$overall_status" in
+        "SUCCESS")
+            print_status $GREEN "🎉 Overall Status: All deployments successful"
+            ;;
+        "FAILED")
+            print_status $RED "💥 Overall Status: One or more deployments failed"
+            ;;
+        "IN_PROGRESS")
+            print_status $YELLOW "⏳ Overall Status: Deployments in progress"
+            ;;
+        "WARNING")
+            print_status $YELLOW "⚠️  Overall Status: Warnings detected"
+            ;;
+    esac
+}
