@@ -26,17 +26,7 @@ check_rg_exists() {
     az group show --name "$rg_name" --query "name" -o tsv 2>/dev/null
 }
 
-# Function to check deletion status
-check_deletion_status() {
-    local rg_name=$1
-    if check_rg_exists "$rg_name" > /dev/null; then
-        echo "⏳ $rg_name: Still deleting..."
-        return 1
-    else
-        echo "✅ $rg_name: Deleted successfully"
-        return 0
-    fi
-}
+
 
 # Trigger async deletions
 echo "Starting async deletion of resource groups..."
@@ -53,33 +43,66 @@ echo ""
 echo "Monitoring deletion progress..."
 echo "This may take several minutes..."
 
-# Monitor deletion status
-max_attempts=60  # 30 minutes with 30-second intervals
-attempt=0
-all_deleted=false
+# Function to clear lines and move cursor up
+clear_status_display() {
+    local lines_to_clear=$1
+    for ((i=0; i<lines_to_clear; i++)); do
+        echo -ne "\033[2K\033[1A"  # Clear line and move up
+    done
+}
 
-while [[ $attempt -lt $max_attempts ]] && [[ $all_deleted == false ]]; do
-    echo ""
-    echo "Status check #$((attempt + 1)):"
+# Function to display current status
+display_status() {
+    local attempt=$1
+    local max_attempts=$2
+    local deleted_count=0
     
-    deleted_count=0
+    echo "Status check #$((attempt + 1))/$max_attempts:"
+    
     for rg in "${RESOURCE_GROUPS[@]}"; do
-        if check_deletion_status "$rg"; then
+        if check_rg_exists "$rg" > /dev/null; then
+            echo "⏳ $rg: Still deleting..."
+        else
+            echo "✅ $rg: Deleted successfully"
             ((deleted_count++))
         fi
     done
     
+    echo "Progress: $deleted_count/${#RESOURCE_GROUPS[@]} completed"
+    
+    if [[ $deleted_count -lt ${#RESOURCE_GROUPS[@]} ]]; then
+        echo "Next check in 30 seconds..."
+    fi
+    
+    return $deleted_count
+}
+
+# Monitor deletion status
+max_attempts=60  # 30 minutes with 30-second intervals
+attempt=0
+all_deleted=false
+status_lines=$((${#RESOURCE_GROUPS[@]} + 3))  # RGs + header + progress + next check
+
+echo ""  # Add initial spacing
+
+while [[ $attempt -lt $max_attempts ]] && [[ $all_deleted == false ]]; do
+    # Clear previous status display (except on first iteration)
+    if [[ $attempt -gt 0 ]]; then
+        clear_status_display $status_lines
+    fi
+    
+    display_status $((attempt + 1)) $max_attempts
+    deleted_count=$?
+    
     if [[ $deleted_count -eq ${#RESOURCE_GROUPS[@]} ]]; then
         all_deleted=true
-        echo ""
+        clear_status_display $status_lines
         echo "🎉 All resource groups have been deleted successfully!"
         break
     fi
     
     ((attempt++))
     if [[ $attempt -lt $max_attempts ]]; then
-        echo ""
-        echo "Waiting 30 seconds before next status check..."
         sleep 30
     fi
 done

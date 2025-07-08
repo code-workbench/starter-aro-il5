@@ -162,13 +162,13 @@ check_deployment_status() {
     fi
     
     # List resources in the resource group
-    echo ""
-    print_status $BLUE "Resources in resource group:"
-    local resources=$(az resource list --resource-group "$resource_group" --query '[].{name:name, type:type, location:location}' --output table 2>/dev/null)
+    # echo ""
+    # print_status $BLUE "Resources in resource group:"
+    # local resources=$(az resource list --resource-group "$resource_group" --query '[].{name:name, type:type, location:location}' --output table 2>/dev/null)
     
-    if [[ -z "$resources" || "$resources" == "[]" ]]; then
-        print_status $YELLOW "⚠️  No resources found in resource group '$resource_group'"
-    fi
+    # if [[ -z "$resources" || "$resources" == "[]" ]]; then
+    #     print_status $YELLOW "⚠️  No resources found in resource group '$resource_group'"
+    # fi
     
     echo ""
     echo "============================================="
@@ -237,4 +237,74 @@ display_summary() {
             print_status $YELLOW "⚠️  Overall Status: Warnings detected"
             ;;
     esac
+}
+
+monitor_deployment_status() {
+    echo "Deployment started. Monitoring progress..."
+    local iteration=0
+    
+    while true; do
+        # Clear screen and move cursor to top-left
+        clear
+        
+        # Show header with timestamp and iteration counter
+        iteration=$((iteration + 1))
+        print_status $BLUE "🔄 DEPLOYMENT MONITOR - Update #$iteration"
+        print_status $BLUE "Last updated: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "============================================="
+        echo ""
+        
+        STATUS=$(az deployment sub show --name $DEPLOYMENT_NAME --query "properties.provisioningState" -o tsv)
+        
+        # Show main deployment status prominently
+        case "$STATUS" in
+            "Succeeded")
+                print_status $GREEN "🎉 MAIN DEPLOYMENT STATUS: $STATUS"
+                ;;
+            "Failed")
+                print_status $RED "❌ MAIN DEPLOYMENT STATUS: $STATUS"
+                ;;
+            "Running")
+                print_status $YELLOW "⏳ MAIN DEPLOYMENT STATUS: $STATUS"
+                ;;
+            *)
+                print_status $YELLOW "⚠️  MAIN DEPLOYMENT STATUS: $STATUS"
+                ;;
+        esac
+        echo ""
+        
+        if [[ "$STATUS" == "Succeeded" ]]; then
+            echo "Deployment completed successfully!"
+            break
+        elif [[ "$STATUS" == "Failed" ]]; then
+            echo "Deployment failed!"
+            az deployment sub show --name $DEPLOYMENT_NAME --query "properties.error" -o json
+            exit 1
+        fi
+        
+        # Construct resource group names based on the naming pattern from the Bicep template
+        local shared_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-shared"
+        local aro_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-aro"
+        local jumpbox_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-jumpbox"
+        
+        print_status $BLUE "Checking deployments for the following resource groups:"
+        echo "• Shared RG: $shared_rg"
+        echo "• ARO RG: $aro_rg"
+        echo "• Jumpbox RG: $jumpbox_rg"
+        echo "• Network RG: $NETWORK_RESOURCE_GROUP_NAME"
+        echo ""
+        
+        # Check deployment status for each resource group
+        check_deployment_status $NETWORK_RESOURCE_GROUP_NAME "Network Resources"
+        check_deployment_status $shared_rg "Shared Resources"
+        check_deployment_status $aro_rg "ARO Cluster"
+        check_deployment_status $jumpbox_rg "Jumpbox"
+        
+        # Display summary
+        display_summary $shared_rg $aro_rg $jumpbox_rg $NETWORK_RESOURCE_GROUP_NAME
+
+        # Show countdown
+        print_status $YELLOW "⏱️  Next update in 60 seconds... (Press Ctrl+C to stop monitoring)"
+        sleep 60
+    done
 }

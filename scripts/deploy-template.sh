@@ -65,44 +65,7 @@ az deployment sub create --name $DEPLOYMENT_NAME --location $LOCATION \
     custom_managed_image_id=$CUSTOM_MANAGED_IMAGE_ID \
     --no-wait
 
-echo "Deployment started. Monitoring progress..."
-while true; do
-    STATUS=$(az deployment sub show --name $DEPLOYMENT_NAME --query "properties.provisioningState" -o tsv)
-    echo "Deployment status: $STATUS"
-    
-    if [[ "$STATUS" == "Succeeded" ]]; then
-        echo "Deployment completed successfully!"
-        break
-    elif [[ "$STATUS" == "Failed" ]]; then
-        echo "Deployment failed!"
-        az deployment sub show --name $DEPLOYMENT_NAME --query "properties.error" -o json
-        exit 1
-    fi
-    
-    # Construct resource group names based on the naming pattern from the Bicep template
-    local shared_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-shared"
-    local aro_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-aro"
-    local jumpbox_rg="${PROJECT_PREFIX}-${ENV_PREFIX}-jumpbox"
-    
-    print_status $BLUE "Checking deployments for the following resource groups:"
-    echo "• Shared RG: $shared_rg"
-    echo "• ARO RG: $aro_rg"
-    echo "• Jumpbox RG: $jumpbox_rg"
-    echo "• Network RG: $NETWORK_RESOURCE_GROUP_NAME"
-    echo ""
-    
-    # Check deployment status for each resource group
-    check_deployment_status $NETWORK_RESOURCE_GROUP_NAME "Network Resources"
-    check_deployment_status $shared_rg "Shared Resources"
-    check_deployment_status $aro_rg "ARO Cluster"
-    check_deployment_status $jumpbox_rg "Jumpbox"
-    
-    # Display summary
-    display_summary $shared_rg $aro_rg $jumpbox_rg $NETWORK_RESOURCE_GROUP_NAME
-
-    echo "Waiting 60 seconds before next update..."
-    sleep 60
-done
+monitor_deployment_status
 
 END_TIME=$(date +%s)
 
