@@ -33,7 +33,7 @@ param cluster_domain string = ''
 param default_tag_name string
 param default_tag_value string
 
-resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
+resource cluster 'Microsoft.RedHatOpenShift/openShiftClusters@2023-11-22' = {
   name: aro_cluster_name
   location: location
   tags: {
