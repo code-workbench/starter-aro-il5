@@ -191,16 +191,17 @@ display_summary() {
     for rg in "$shared_rg" "$aro_rg" "$jumpbox_rg" "$network_rg"; do
         if az group show --name "$rg" &>/dev/null; then
             local latest_state=$(az deployment group list --resource-group "$rg" --query '[0].properties.provisioningState' --output tsv 2>/dev/null)
+            echo "DEBUG: Raw state value: '${latest_state}'" >&2
             case "$latest_state" in
-                "Succeeded")
+                "succeeded")
                     print_status $GREEN "✅ $rg: Deployment succeeded"
                     ;;
-                "Failed")
+                "failed")
                     print_status $RED "❌ $rg: Deployment failed"
                     overall_status="FAILED"
                     ;;
-                "Running")
-                    print_status $YELLOW "⏳ $rg: Deployment in progress"
+                "running"|"accepted"|"creating"|"updating"|"inprogress")
+                    print_status $YELLOW "⏳ $rg: Deployment in progress (${latest_state})"
                     overall_status="IN_PROGRESS"
                     ;;
                 "")
@@ -210,7 +211,7 @@ display_summary() {
                     fi
                     ;;
                 *)
-                    print_status $YELLOW "⚠️  $rg: Status unknown ($latest_state)"
+                    print_status $YELLOW "⚠️  $rg: Status unknown (${latest_state})"
                     if [[ "$overall_status" == "SUCCESS" ]]; then
                         overall_status="WARNING"
                     fi
