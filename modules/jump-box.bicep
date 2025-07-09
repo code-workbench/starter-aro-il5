@@ -7,6 +7,9 @@ param admin_username string
 @secure()
 param admin_password string
 
+// Optional custom managed image parameter
+param custom_managed_image_id string = ''
+
 // Tag Configuration:
 param default_tag_name string
 param default_tag_value string
@@ -43,7 +46,14 @@ resource virtualMachine 'Microsoft.Compute/virtualMachines@2023-09-01' = {
       adminUsername: admin_username
       adminPassword: admin_password
     }
-    storageProfile: {
+    storageProfile: !empty(custom_managed_image_id) ? {
+      imageReference: {
+        id: custom_managed_image_id
+      }
+      osDisk: {
+        createOption: 'FromImage'
+      }
+    } : {
       imageReference: {
         publisher: 'MicrosoftWindowsServer'
         offer: 'WindowsServer'

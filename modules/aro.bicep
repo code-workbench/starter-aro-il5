@@ -33,7 +33,7 @@ param cluster_domain string = ''
 param default_tag_name string
 param default_tag_value string
 
-resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
+resource cluster 'Microsoft.RedHatOpenShift/openShiftClusters@2023-11-22' = {
   name: aro_cluster_name
   location: location
   tags: {
@@ -44,6 +44,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
       domain: cluster_domain
       pullSecret: redhat_pull_secret
       resourceGroupId: subscriptionResourceId('Microsoft.Resources/resourceGroups', '${project_prefix}-${env_prefix}-aro-infra')
+      fipsValidatedModules: 'Enabled'
     }
     networkProfile: {
       podCidr: pod_cidr
@@ -57,6 +58,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
     masterProfile: {
       vmSize: control_plane_vm_size
       subnetId: control_plane_subnet_id
+      encryptionAtHost: 'Enabled'
     }
     workerProfiles: [
       {
@@ -65,6 +67,7 @@ resource cluster 'Microsoft.RedHatOpenShift/OpenShiftClusters@2020-04-30' = {
         diskSizeGB: pool_cluster_disk_size
         subnetId: worker_subnet_id
         count: pool_cluster_count
+        encryptionAtHost: 'Enabled'
       }
     ]
     apiserverProfile: {

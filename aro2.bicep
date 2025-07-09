@@ -64,6 +64,10 @@ param pool_cluster_size string = 'Standard_D8s_v3'
 param pool_cluster_disk_size int = 128
 param pool_cluster_count int = 3
 
+// Optional Custom Managed Image
+@description('The ID of a custom managed image to use for the ARO cluster')
+param custom_managed_image_id string = ''
+
 // Tag Configuration:
 param default_tag_name string
 param default_tag_value string
@@ -110,45 +114,7 @@ module existing_network './modules/network.bicep' = {
   }
 }
 
-module registry './modules/registry.bicep' = {
-  name: 'registry'
-  scope: shared_resource_group
-  params: {
-    acr_name: '${project_prefix}${env_prefix}acr'
-    location: location
-    subnetId: existing_network.outputs.registry_subnet_id
-    vnet_id: existing_network.outputs.id   
-    default_tag_name: default_tag_name
-    default_tag_value: default_tag_value
-    registry_key_uri: key_vault.outputs.registry_key_uri
-    registry_managed_identity_id: key_vault.outputs.registry_managed_identity_id
-    registry_managed_identity_principal_id: key_vault.outputs.registry_managed_identity_principal_id
-    registry_managed_identity_client_id: key_vault.outputs.registry_managed_identity_client_id
-  }
-  dependsOn: [
-    key_vault
-  ]
-}
-
-module storage './modules/storage.bicep' = {
-  name: 'storage'
-  scope: shared_resource_group
-  params: {
-    storage_account_name: '${project_prefix}${env_prefix}stg'
-    location: location
-    subnet_id: existing_network.outputs.storage_subnet_id
-    vnet_id: existing_network.outputs.id
-    default_tag_name: default_tag_name
-    default_tag_value: default_tag_value
-    key_name: storage_account_key_name
-    key_vault_uri: key_vault.outputs.key_vault_uri
-    storage_managed_identity_id: key_vault.outputs.storage_managed_identity_id
-  }
-  dependsOn: [
-    key_vault
-  ]
-}
-
+// Deploy Key Vault first as it's required by other modules
 module key_vault './modules/key-vault.bicep' = {
   name: 'key-vault'
   scope: shared_resource_group
@@ -166,6 +132,41 @@ module key_vault './modules/key-vault.bicep' = {
   }
 }
 
+// Deploy registry and storage in parallel after key vault
+module registry './modules/registry.bicep' = {
+  name: 'registry'
+  scope: shared_resource_group
+  params: {
+    acr_name: '${project_prefix}${env_prefix}acr'
+    location: location
+    subnetId: existing_network.outputs.registry_subnet_id
+    vnet_id: existing_network.outputs.id   
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+    registry_key_uri: key_vault.outputs.registry_key_uri
+    registry_managed_identity_id: key_vault.outputs.registry_managed_identity_id
+    registry_managed_identity_principal_id: key_vault.outputs.registry_managed_identity_principal_id
+    registry_managed_identity_client_id: key_vault.outputs.registry_managed_identity_client_id
+  }
+}
+
+module storage './modules/storage.bicep' = {
+  name: 'storage'
+  scope: shared_resource_group
+  params: {
+    storage_account_name: '${project_prefix}${env_prefix}stg'
+    location: location
+    subnet_id: existing_network.outputs.storage_subnet_id
+    vnet_id: existing_network.outputs.id
+    default_tag_name: default_tag_name
+    default_tag_value: default_tag_value
+    key_name: storage_account_key_name
+    key_vault_uri: key_vault.outputs.key_vault_uri
+    storage_managed_identity_id: key_vault.outputs.storage_managed_identity_id
+  }
+}
+
+// Deploy ARO in parallel with registry and storage (since ARO doesn't depend on them)
 module aro './modules/aro.bicep' = {
   name: 'aro'
   scope: aro_resource_group
@@ -199,13 +200,11 @@ module jumpbox './modules/jump-box.bicep' = if (deploy_jumpbox) {
     location: location
     admin_username: jumpbox_username
     admin_password: jumpbox_password
+    custom_managed_image_id: custom_managed_image_id
     jumpbox_subnet_id: existing_network.outputs.jumpbox_subnet_id
     default_tag_name: default_tag_name
     default_tag_value: default_tag_value
   }
-  dependsOn: [
-    existing_network
-  ]
 }
 
 output registry_id string = registry.outputs.id

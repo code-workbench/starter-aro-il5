@@ -12,5 +12,6 @@
     "subscriptionId":"",
     "deployJumpBox": false,
     "jumpboxUsername": "",
-    "jumpboxPassword": ""
+    "jumpboxPassword": "",
+    "custom_managed_image_id": ""
 }
