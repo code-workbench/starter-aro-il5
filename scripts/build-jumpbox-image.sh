@@ -40,7 +40,7 @@ else
 fi
 
 echo "Building Packer image..."
-packer build -var "subscription_id=$SUBSCRIPTION_ID" -var "location=$LOCATION" ./custom-images/kubernetes-linux-jumpbox.pkr.hcl
+packer build -var "subscription_id=$SUBSCRIPTION_ID" -var "location=$LOCATION" -force ./custom-images/kubernetes-linux-jumpbox.pkr.hcl
 if [[ $? -ne 0 ]]; then
     echo "Packer image build failed. Exiting."
     exit 1

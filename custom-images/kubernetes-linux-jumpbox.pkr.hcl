@@ -37,7 +37,7 @@ source "azure-arm" "ubuntu2404" {
   location               = var.location
 
   managed_image_resource_group_name = var.managed_images_rg_name
-  managed_image_name                = var.managed_image_name
+  managed_image_name                = "${var.managed_image_name}-${var.location}"
 
   vm_size           = "Standard_DS1_v2"
   os_type           = "Linux"
