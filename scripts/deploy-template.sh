@@ -12,7 +12,7 @@ else
     parse_passed_parameters "$@"
 fi
 
-TEMPLATE_FILE=$(realpath ./aro.bicep)
+TEMPLATE_FILE=$(realpath ./aro2.bicep)
 
 # Generate a random suffix for deployment name to prevent collisions
 RANDOM_SUFFIX=$(openssl rand -hex 4)

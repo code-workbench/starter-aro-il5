@@ -191,7 +191,7 @@ display_summary() {
     for rg in "$shared_rg" "$aro_rg" "$jumpbox_rg" "$network_rg"; do
         if az group show --name "$rg" &>/dev/null; then
             local latest_state=$(az deployment group list --resource-group "$rg" --query '[0].properties.provisioningState' --output tsv 2>/dev/null)
-            echo "DEBUG: Raw state value: '${latest_state}'" >&2
+            latest_state=$(echo "$latest_state" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
             case "$latest_state" in
                 "succeeded")
                     print_status $GREEN "✅ $rg: Deployment succeeded"
